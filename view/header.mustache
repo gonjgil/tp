@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>La Banda</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+
+<div class="w3-top">
+    <div class="w3-bar w3-black w3-card">
+        <a href="/tp" class="w3-bar-item w3-button w3-padding-large">La banda</a>
+        <a href="/tp/song/index" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Canciones</a>
+        <a href="/tp/tour/index" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Presentaciones</a>
+        <a href="/tp/group/request" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Sumarme</a>
+
+        {{^user}}
+            <a href="index.php?controller=auth&method=login" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Login</a>
+            <a href="index.php?controller=auth&method=register" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Registro</a>
+        {{/user}}
+
+        {{#user}}
+            <span class="w3-bar-item w3-padding-large">Hola, {{name}}</span>
+            <a href="index.php?controller=auth&method=logout" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Cerrar sesión</a>
+        {{/user}}
+    </div>
+</div>
+
+
+
+
+
+<div class="w3-content" style="max-width:2000px;margin-top:46px">
