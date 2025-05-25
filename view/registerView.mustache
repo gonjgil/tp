@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body class="w3-display-container" style="height: 100vh;">
+
+<div class="w3-display-middle" style="width: 100%; max-width: 600px;">
+    <div class="w3-card w3-white w3-padding w3-round-large">
+        <h2 class="w3-center">Registrarse</h2>
+
+        {{#errors}}
+            <div class="w3-panel w3-red w3-padding-small w3-center">
+                {{.}}
+            </div>
+        {{/errors}}
+
+        <form method="POST" action="index.php?controller=register&method=handleRegister"
+              enctype="multipart/form-data" class="w3-container">
+
+            <div class="w3-row-padding">
+                <div class="w3-half">
+                    <input class="w3-input w3-border w3-margin-bottom" type="text" name="name" placeholder="Nombre" required>
+                </div>
+                <div class="w3-half">
+                    <input class="w3-input w3-border w3-margin-bottom" type="text" name="last_name" placeholder="Apellido" required>
+                </div>
+            </div>
+
+            <div class="w3-row-padding">
+                <div class="w3-half">
+                    <input class="w3-input w3-border w3-margin-bottom" type="date" name="birth_date" placeholder="Fecha de nacimiento" required>
+                </div>
+                <div class="w3-half">
+                    <select class="w3-select w3-border w3-margin-bottom" name="gender" required>
+                        <option value="" disabled selected>Sexo</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Prefiero no cargarlo">Prefiero no cargarlo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="w3-row-padding">
+                <div class="w3-half">
+                    <input class="w3-input w3-border w3-margin-bottom" type="text" name="country" placeholder="País" required>
+                </div>
+                <div class="w3-half">
+                    <input class="w3-input w3-border w3-margin-bottom" type="text" name="city" placeholder="Ciudad" required>
+                </div>
+            </div>
+
+            <input class="w3-input w3-border w3-margin-bottom" type="email" name="email" placeholder="Email" required>
+            <input class="w3-input w3-border w3-margin-bottom" type="text" name="username" placeholder="Nombre de usuario" required>
+            <input class="w3-input w3-border w3-margin-bottom" type="password" name="password" placeholder="Contraseña" required>
+            <input class="w3-input w3-border w3-margin-bottom" type="password" name="repeat_password" placeholder="Repetir contraseña" required>
+
+            <label class="w3-text-grey">Foto de perfil</label>
+            <input class="w3-input w3-border w3-margin-bottom" type="file" name="profile_picture" accept="image/*">
+
+            <p class="w3-center">
+                <button class="w3-button w3-black w3-round-large" type="submit">Crear cuenta</button>
+            </p>
+        </form>
+
+        <div class="w3-center w3-small">
+            <p>¿Ya posees cuenta? <a href="index.php?controller=login&method=login" class="w3-text-blue">Inicia sesión</a></p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
