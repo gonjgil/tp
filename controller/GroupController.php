@@ -23,8 +23,8 @@ class GroupController
 
     public function add()
     {
-        $nombre = $_POST["nombre"]; // Acá valido que el parametro no sea vacio o erroneo
-        $instrumento = $_POST["instrumento"]; // Acá valido que el parametro no sea vacio o erroneo
+        $nombre = $_POST["nombre"];
+        $instrumento = $_POST["instrumento"];
         $this->model->add($nombre, $instrumento);
         $this->redirectTo("/tp/group/success");
     }

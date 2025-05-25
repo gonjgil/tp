@@ -8,12 +8,14 @@ require_once("controller/HomeController.php");
 require_once("controller/GroupController.php");
 require_once("controller/SongController.php");
 require_once("controller/TourController.php");
-require_once("controller/AuthController.php");
+require_once ("controller/LoginController.php");
+require_once ("controller/RegisterController.php");
 
 require_once("model/GroupModel.php");
 require_once("model/SongModel.php");
 require_once("model/TourModel.php");
-require_once("model/UserModel.php");
+require_once("model/LoginModel.php");
+require_once("model/RegisterModel.php");
 
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
@@ -75,10 +77,20 @@ class Configuration
         return new MustachePresenter("view");
     }
 
-    public function getAuthController() {
-        return new AuthController(
-            new MustachePresenter("view"),
-            new UserModel($this->getDatabase())
+
+    public function getLoginController()
+    {
+        return new LoginController(
+            $this->getViewer(),
+            new LoginModel($this->getDatabase())
+        );
+    }
+
+    public function getRegisterController()
+    {
+        return new RegisterController(
+            $this->getViewer(),
+            new RegisterModel($this->getDatabase())
         );
     }
 }

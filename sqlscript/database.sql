@@ -32,9 +32,18 @@ create table integrantes
 
 INSERT INTO integrantes(nombre, instrumento) VALUE ('facu', 'ukelele')
 
+
 CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    password VARCHAR(255)
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR(100) NOT NULL,
+   last_name VARCHAR(100) NOT NULL,
+   birth_date DATE NOT NULL,
+   gender ENUM('Masculino', 'Femenino', 'Prefiero no cargarlo') NOT NULL,
+   country VARCHAR(100) NOT NULL,
+   city VARCHAR(100) NOT NULL,
+   email VARCHAR(100) NOT NULL,
+   username VARCHAR(100) NOT NULL UNIQUE,
+   password VARCHAR(255) NOT NULL,
+   profile_picture VARCHAR(255),
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

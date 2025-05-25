@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-
-
 <div class="w3-top">
     <div class="w3-bar w3-black w3-card">
         <a href="/tp" class="w3-bar-item w3-button w3-padding-large">La banda</a>
@@ -19,19 +17,20 @@
         <a href="/tp/group/request" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Sumarme</a>
 
         {{^user}}
-            <a href="index.php?controller=auth&method=login" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Login</a>
-            <a href="index.php?controller=auth&method=register" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Registro</a>
+            <div class="w3-right">
+                <a href="index.php?controller=login&method=login" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Login</a>
+                <a href="index.php?controller=register&method=register" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Registro</a>
+            </div>
         {{/user}}
 
         {{#user}}
-            <span class="w3-bar-item w3-padding-large">Hola, {{name}}</span>
-            <a href="index.php?controller=auth&method=logout" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Cerrar sesión</a>
+            <div class="w3-bar-item w3-right w3-padding-large">
+                <img src="{{profile_picture}}" alt="Perfil" style="height:40px;width:40px;border-radius:50%;object-fit:cover;">
+                <span class="w3-margin-left">Hola, {{name}}</span>
+                <a href="index.php?controller=login&method=logout" class="w3-bar-item w3-button w3-padding-large">Cerrar sesión</a>
+            </div>
         {{/user}}
     </div>
 </div>
-
-
-
-
 
 <div class="w3-content" style="max-width:2000px;margin-top:46px">
