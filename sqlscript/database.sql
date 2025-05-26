@@ -50,11 +50,11 @@ CREATE TABLE users (
 
 INSERT INTO users (name, last_name, birth_date, gender, country, city, email, username, password, profile_picture, user_type) VALUES (
      'Elena', 'Editor', '1990-05-15', 'Femenino', 'Argentina', 'Buenos Aires', 'elena.editor@example.com',
-  'editor1', '$2y$10$wH6TxFqlGV9hxX8Bzn2QmeYPK4Dp74yrtz7os5hOAJHZyKmndPOle', 'uploads/default.jpg', 'editor'
+  'editor1', '123', 'uploads/default.jpg', 'editor'
     );
 
 INSERT INTO users (
     name, last_name, birth_date, gender, country, city, email,username, password, profile_picture, user_type) VALUES (
              'Alan', 'Admin', '1985-02-20', 'Masculino', 'Argentina', 'Córdoba', 'alan.admin@example.com',
-             'admin1', '$2y$10$wH6TxFqlGV9hxX8Bzn2QmeYPK4Dp74yrtz7os5hOAJHZyKmndPOle', 'uploads/default.jpg', 'administrador'
+             'admin1', '123', 'uploads/default.jpg', 'administrador'
     );
