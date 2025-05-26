@@ -8,3 +8,5 @@ $router->go(
     $_GET["controller"],
     $_GET["method"]
 );
+
+//prueba
