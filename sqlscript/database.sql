@@ -30,7 +30,7 @@ create table integrantes
         primary key
 );
 
-INSERT INTO integrantes(nombre, instrumento) VALUE ('facu', 'ukelele')
+INSERT INTO integrantes(nombre, instrumento) VALUE ('facu', 'ukelele');
 
 
 CREATE TABLE users (
@@ -45,5 +45,16 @@ CREATE TABLE users (
    username VARCHAR(100) NOT NULL UNIQUE,
    password VARCHAR(255) NOT NULL,
    profile_picture VARCHAR(255),
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+   user_type ENUM('jugador', 'editor', 'administrador'),
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+
+INSERT INTO users (name, last_name, birth_date, gender, country, city, email, username, password, profile_picture, user_type) VALUES (
+     'Elena', 'Editor', '1990-05-15', 'Femenino', 'Argentina', 'Buenos Aires', 'elena.editor@example.com',
+  'editor1', '$2y$10$wH6TxFqlGV9hxX8Bzn2QmeYPK4Dp74yrtz7os5hOAJHZyKmndPOle', 'uploads/default.jpg', 'editor'
+    );
+
+INSERT INTO users (
+    name, last_name, birth_date, gender, country, city, email,username, password, profile_picture, user_type) VALUES (
+             'Alan', 'Admin', '1985-02-20', 'Masculino', 'Argentina', 'Córdoba', 'alan.admin@example.com',
+             'admin1', '$2y$10$wH6TxFqlGV9hxX8Bzn2QmeYPK4Dp74yrtz7os5hOAJHZyKmndPOle', 'uploads/default.jpg', 'administrador'
+    );

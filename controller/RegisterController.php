@@ -11,7 +11,7 @@ class RegisterController
         $this->model = $registerModel;
     }
 
-    public function register()
+    public function index()
     {
         $this->view->render('register');
     }
@@ -36,9 +36,10 @@ class RegisterController
                 $data['email'],
                 $data['username'],
                 $hashedPassword,
-                $profilePicture
+                $profilePicture,
+                'jugador'
             );
-            header("Location: index.php?controller=login&method=login");
+            header("Location: /tp/login");
         } else {
             $this->view->render("register", ['errors' => $errors]);
         }
@@ -63,6 +64,10 @@ class RegisterController
 
         if ($data['password'] !== $data['repeat_password']) {
             $errors[] = "Las contraseñas no coinciden";
+        }
+
+        if ($this->model->isEmailTaken($data['email'])) {
+            $errors[] = "El email ya esta en uso";
         }
 
         if ($this->model->isUsernameTaken($data['username'])) {

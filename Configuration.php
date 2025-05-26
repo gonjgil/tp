@@ -10,12 +10,18 @@ require_once("controller/SongController.php");
 require_once("controller/TourController.php");
 require_once ("controller/LoginController.php");
 require_once ("controller/RegisterController.php");
+require_once ("controller/AdminController.php");
+require_once ("controller/EditorController.php");
+require_once ("controller/PlayerController.php");
 
 require_once("model/GroupModel.php");
 require_once("model/SongModel.php");
 require_once("model/TourModel.php");
 require_once("model/LoginModel.php");
 require_once("model/RegisterModel.php");
+require_once("model/AdminModel.php");
+require_once("model/EditorModel.php");
+require_once("model/PlayerModel.php");
 
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
@@ -91,6 +97,33 @@ class Configuration
         return new RegisterController(
             $this->getViewer(),
             new RegisterModel($this->getDatabase())
+        );
+    }
+
+    public function getPlayerController()
+    {
+        return new PlayerController(
+            $this->getViewer(),
+            new PlayerModel($this->getDatabase())
+
+        );
+    }
+
+    public function getEditorController()
+    {
+        return new EditorController(
+            $this->getViewer(),
+            new EditorModel($this->getDatabase())
+
+        );
+    }
+
+    public function getAdminController()
+    {
+        return new AdminController(
+            $this->getViewer(),
+            new AdminModel($this->getDatabase())
+
         );
     }
 }
