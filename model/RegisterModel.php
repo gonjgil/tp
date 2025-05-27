@@ -15,12 +15,21 @@ class RegisterModel {
         return $stmt->get_result()->num_rows > 0;
     }
 
-    public function createUser($name, $lastName, $birthDate, $gender, $country, $city, $email, $username, $hashedPassword, $profilePicture) {
-        $stmt = $this->database->prepare("INSERT INTO users (name, last_name, birth_date, gender, country, city, email, username, password, profile_picture)
-                                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssisssssss", $name, $lastName, $birthDate, $gender, $country, $city, $email, $username, $hashedPassword, $profilePicture);
+    public function isEmailTaken($email) {
+        $stmt = $this->database->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+        return $stmt->num_rows > 0;
+    }
+
+    public function createUser($name, $lastName, $birthDate, $gender, $country, $city, $email, $username, $hashedPassword, $profilePicture, $userType = 'jugador') {
+        $stmt = $this->database->prepare("INSERT INTO users (name, last_name, birth_date, gender, country, city, email, username, password, profile_picture, user_type)
+                                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssssss", $name, $lastName, $birthDate, $gender, $country, $city, $email, $username, $hashedPassword, $profilePicture, $userType);
         return $stmt->execute();
     }
+
 
 
 }

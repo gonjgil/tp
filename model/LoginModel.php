@@ -1,5 +1,4 @@
 <?php
-
 class LoginModel {
     private $database;
 
