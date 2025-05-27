@@ -25,7 +25,8 @@ class RegisterController
         $profilePicture = $this->ProfilePictureUpload($_FILES['profile_picture'], $username);
 
         if (empty($errors)) {
-            $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+            $rawPassword = $data['password'];
+
             $this->model->createUser(
                 $data['name'],
                 $data['last_name'],
@@ -35,7 +36,7 @@ class RegisterController
                 $data['city'],
                 $data['email'],
                 $data['username'],
-                $hashedPassword,
+                $rawPassword,
                 $profilePicture,
                 'jugador'
             );
@@ -44,6 +45,7 @@ class RegisterController
             $this->view->render("register", ['errors' => $errors]);
         }
     }
+
 
 
 

@@ -27,10 +27,11 @@ class LoginController
             return;
         }
 
-        if (!password_verify($password, $user['password'])) {
+        if ($password !== $user['password']) {
             $this->view->render('login', ['error' => "Contraseña incorrecta"]);
             return;
         }
+
 
         $_SESSION['user'] = [
             'id' => $user['id'],

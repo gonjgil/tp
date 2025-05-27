@@ -16,6 +16,21 @@ class MustachePresenter{
     public function render($contentFile , $data = array() ){
         if (isset($_SESSION['user'])) {
             $data['user'] = $_SESSION['user'];
+
+            switch ($_SESSION['user']['user_type']) {
+                case 'jugador':
+                    $data['panelUrl'] = '/tp/player/panel';
+                    break;
+                case 'editor':
+                    $data['panelUrl'] = '/tp/editor/panel';
+                    break;
+                case 'administrador':
+                    $data['panelUrl'] = '/tp/admin/panel';
+                    break;
+                default:
+                    $data['panelUrl'] = '/tp/home/index';
+                    break;
+            }
         }
 
         echo $this->generateHtml($this->partialsPathLoader . '/' . $contentFile . "View.mustache", $data);

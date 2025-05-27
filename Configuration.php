@@ -132,7 +132,7 @@ class Configuration
     public function getPerfilUsuarioController() {
         return new PerfilUsuarioController(
             $this->getViewer(),
-            new UserModel($this->getDatabase())
+            new PerfilUsuarioModel($this->getDatabase())
         );
     }
 }
