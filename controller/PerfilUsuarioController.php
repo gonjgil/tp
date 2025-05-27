@@ -23,19 +23,12 @@ class PerfilUsuarioController
         }
 
         $id = $_SESSION['user']['id'];
-        $user = $this->model->getUserById((int)$id);
+        $user = $this->model->getUserById($id);
 
         if (!$user) {
-            die("No existe usuario con ID $id.");
+            die("No se encontró el usuario.");
         }
 
-        echo "<pre>";
-        print_r($user);
-        echo "</pre>";
-        exit;
-
-        $this->view->render('perfilUsuario', ['user' => $user]);
+        $this->view->render("perfilUsuario", $user);
     }
-
-
 }

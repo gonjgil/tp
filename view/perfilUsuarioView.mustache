@@ -1,39 +1,22 @@
-<div class="container-fluid" style="background-color: #FFF4E6; min-height: calc(100vh - 64px);">
-  <div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 64px);">
-    <div class="card shadow" style="width: 100%; max-width: 600px; border-radius: 15px;">
-      <div class="card-header text-center" style="background-color: #FFA500; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-        <h3 class="mb-0">Perfil de Usuario</h3>
-      </div>
-      <div class="card-body py-4">
-        <div class="text-center mb-4">
-          {{#user.foto_perfil}}
-            <img src="{{user.foto_perfil}}" alt="Foto de perfil"
-                 class="rounded-circle" style="width:120px;height:120px;object-fit:cover;border:3px solid #6F42C1;">
-          {{/user.foto_perfil}}
-          <h4 class="text-primary mt-3">{{user.nombre}} {{user.apellido}}</h4>
+<div class="w3-container w3-margin-top">
+    <div class="w3-card-4 w3-white w3-round-large w3-padding-large w3-animate-opacity">
+        <div class="w3-center">
+            <h2>Perfil de {{username}}</h2>
+            <img src="/tp/{{profile_picture}}" alt="Foto de perfil"
+                 class="w3-circle" style="width:150px;height:150px;object-fit:cover;">
         </div>
-        <div class="row">
-          <!-- Etiquetas -->
-          <div class="col-5 text-end pe-3">
-            <p class="mb-2"><strong>Fecha de nacimiento:</strong></p>
-            <p class="mb-2"><strong>Género:</strong></p>
-            <p class="mb-2"><strong>País:</strong></p>
-            <p class="mb-2"><strong>Ciudad:</strong></p>
-            <p class="mb-2"><strong>Edad:</strong></p>
-            <p class="mb-2"><strong>Email:</strong></p>
-            <p class="mb-0"><strong>Usuario:</strong></p>
-          </div>
-          <div class="col-7 text-start ps-3">
-            <p class="mb-2">{{user.fecha_nacimiento}}</p>
-            <p class="mb-2">{{user.genero}}</p>
-            <p class="mb-2">{{user.pais}}</p>
-            <p class="mb-2">{{user.ciudad}}</p>
-            <p class="mb-2">{{user.edad}}</p>
-            <p class="mb-2">{{user.email}}</p>
-            <p class="mb-0">{{user.nombre_usuario}}</p>
-          </div>
+
+        <div class="w3-container w3-margin-top">
+            <p><strong>Nombre:</strong> {{name}} {{last_name}}</p>
+            <p><strong>Fecha de nacimiento:</strong> {{birth_date}}</p>
+            <p><strong>Género:</strong> {{gender}}</p>
+            <p><strong>País:</strong> {{country}}</p>
+            <p><strong>Ciudad:</strong> {{city}}</p>
+            <p><strong>Email:</strong> {{email}}</p>
+            <p><strong>Tipo de usuario:</strong> {{user_type}}</p>
+            <p><strong>Fecha de registro:</strong> {{created_at}}</p>
         </div>
-      </div>
     </div>
-  </div>
 </div>
+
+
