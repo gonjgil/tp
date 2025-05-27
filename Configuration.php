@@ -22,6 +22,7 @@ require_once("model/LoginModel.php");
 require_once("model/RegisterModel.php");
 require_once("model/AdminModel.php");
 require_once("model/EditorModel.php");
+require_once("model/PlayerModel.php");
 require_once("model/PerfilUsuarioModel.php");
 
 
