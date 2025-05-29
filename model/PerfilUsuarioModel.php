@@ -8,11 +8,19 @@ class PerfilUsuarioModel{
 
     public function getUserById($id)
     {
-        $stmt = $this->database->prepare("SELECT id,name,last_name,birth_date,gender,country,city,email,username,profile_picture,user_type,created_at
-        FROM users WHERE id = ?");
+        $stmt = $this->database->prepare("
+        SELECT u.id, u.name, u.last_name, u.birth_date, g.type AS gender, 
+               u.country, u.city, u.email, u.username, u.profile_picture, 
+               r.type AS user_type, u.created_at, u.lat, u.lng
+        FROM users u
+        JOIN gender g ON u.id_gender = g.id_gender
+        JOIN rol r ON u.id_rol = r.id_rol
+        WHERE u.id = ?
+        ");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result ? $result->fetch_assoc() : null;
     }
+
 }

@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <div class="w3-container w3-margin-top">
     <div class="w3-card-4 w3-white w3-round-large w3-padding-large w3-animate-opacity">
         <div class="w3-center">
@@ -15,8 +17,33 @@
             <p><strong>Email:</strong> {{email}}</p>
             <p><strong>Tipo de usuario:</strong> {{user_type}}</p>
             <p><strong>Fecha de registro:</strong> {{created_at}}</p>
+            <p><strong>Ubicación:</strong></p>
+            <div id="map" style="height: 300px; border-radius: 10px;"></div>
         </div>
     </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var lat = {{#lat}}{{lat}}{{/lat}}{{^lat}}null{{/lat}};
+        var lng = {{#lng}}{{lng}}{{/lng}}{{^lng}}null{{/lng}};
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+            var map = L.map('map').setView([lat, lng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+            }).addTo(map);
+
+            L.marker([lat, lng]).addTo(map)
+                    .bindPopup("Ubicación del usuario")
+                    .openPopup();
+        } else {
+            document.getElementById('map').innerHTML = "<p>Ubicación no disponible.</p>";
+        }
+    });
+</script>
+
 
 

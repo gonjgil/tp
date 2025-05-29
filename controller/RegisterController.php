@@ -27,6 +27,9 @@ class RegisterController
         if (empty($errors)) {
             $rawPassword = $data['password'];
 
+            $lat = isset($data['lat']) ? floatval($data['lat']) : null;
+            $lng = isset($data['lng']) ? floatval($data['lng']) : null;
+
             $this->model->createUser(
                 $data['name'],
                 $data['last_name'],
@@ -38,13 +41,19 @@ class RegisterController
                 $data['username'],
                 $rawPassword,
                 $profilePicture,
-                'jugador'
+                3,      // id_rol por defecto = jugador
+                1,      // is_active = true
+                $lat,
+                $lng
             );
+
             header("Location: /tp/login");
+            exit;
         } else {
             $this->view->render("register", ['errors' => $errors]);
         }
     }
+
 
 
 
