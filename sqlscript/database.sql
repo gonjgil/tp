@@ -1,60 +1,101 @@
-CREATE DATABASE labanda;
-USE labanda;
+CREATE DATABASE IF NOT EXISTS trivia;
+USE trivia;
 
-DROP TABLE IF EXISTS `canciones`;
-CREATE TABLE `canciones` (
-  `idCancion` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(45) DEFAULT NULL,
-  `duracion` int(11) DEFAULT NULL,
-  PRIMARY KEY (`idCancion`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/* GENEROS (tabla) */
+CREATE TABLE IF NOT EXISTS gender (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        type varchar(100) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `canciones` VALUES (1,'cancion1',10),(2,'cancion2',12),(3,'cancion3',15);
+/* ROL (tabla) */
+CREATE TABLE IF NOT EXISTS rol (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        type varchar(100) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-DROP TABLE IF EXISTS `presentaciones`;
-CREATE TABLE `presentaciones` (
-  `idPresentacion` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(45) DEFAULT NULL,
-  `fecha` datetime DEFAULT NULL,
-  `precio` int(11) DEFAULT NULL,
-  PRIMARY KEY (`idPresentacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/* USUARIOS (tabla) */
+CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, -- Equivale a id_cuenta
+        id_gender INT NOT NULL, -- genero
+        id_rol INT NOT NULL DEFAULT 3,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- fecha_creacion
+        email VARCHAR(100) NOT NULL, -- mail
+        username VARCHAR(100) NOT NULL, -- usuario
+        password VARCHAR(100) NOT NULL, -- contrasenia
+        profile_picture VARCHAR(100) NOT NULL, -- foto_perfil
+        birth_date DATE NOT NULL, -- fecha_nacimiento
+        name VARCHAR(100) NOT NULL, -- nombre
+        last_name VARCHAR(100) NOT NULL, -- apellido
+        is_active TINYINT(1) NOT NULL, -- esta_activa
+        validation_date TIMESTAMP NULL DEFAULT NULL, -- fecha_validacion
+        token VARCHAR(100) DEFAULT NULL,
+        total_answers INT(11) NOT NULL DEFAULT 0, -- cantidad_respuestas
+        correct_answers INT(11) NOT NULL DEFAULT 0, -- cantidad_correctas
+        difficulty FLOAT NOT NULL DEFAULT 1,
+        lat FLOAT DEFAULT NULL,
+        lng FLOAT DEFAULT NULL,
+        age INT(11) GENERATED ALWAYS AS (TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) VIRTUAL, -- edad_calculada
+        country VARCHAR(100) NOT NULL, -- pais
+        city VARCHAR(100) NOT NULL, -- ciudad
+        UNIQUE KEY unique_username (username),
+        UNIQUE KEY unique_email (email),
+        FOREIGN KEY (id_gender) REFERENCES gender(id),
+        FOREIGN KEY (id_rol) REFERENCES rol(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `presentaciones` VALUES (1,'Presentacion 1','2020-06-02 22:02:14',10),(2,'Presentacion 2','2020-06-02 22:02:19',10),(3,'Presentacion 3','2020-06-02 22:02:21',10);
+/* CATEGORIAS (tabla) */
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-create table integrantes
-(
-    nombre      text null,
-    instrumento text null,
-    id          int auto_increment
-        primary key
-);
+/* PREGUNTAS (tabla) */
+CREATE TABLE IF NOT EXISTS questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+    creator_id INT NULL, -- ahora permite nulls
+    question_text VARCHAR(255) NOT NULL,
+    approved TINYINT(1) NOT NULL DEFAULT 0,
+    reported TINYINT(1) NOT NULL DEFAULT 0,
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (creator_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO integrantes(nombre, instrumento) VALUE ('facu', 'ukelele');
+/* RESPUESTAS (tabla) */
+CREATE TABLE IF NOT EXISTS answers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question_id INT NOT NULL,
+    answer_text VARCHAR(255) NOT NULL,
+    is_correct TINYINT(1) NOT NULL DEFAULT 0,
+    FOREIGN KEY (question_id) REFERENCES questions(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+/* PARTIDAS (tabla) */
+CREATE TABLE IF NOT EXISTS games (
+    id_game INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL, -- quien juega
+    correct_answers INT NOT NULL DEFAULT 0, -- puntos en esta partida
+    total_questions INT NOT NULL DEFAULT 0, -- cuántas preguntas respondió
+    start_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    end_time DATETIME NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE users (
-   id INT AUTO_INCREMENT PRIMARY KEY,
-   name VARCHAR(100) NOT NULL,
-   last_name VARCHAR(100) NOT NULL,
-   birth_date DATE NOT NULL,
-   gender ENUM('Masculino', 'Femenino', 'Prefiero no cargarlo') NOT NULL,
-   country VARCHAR(100) NOT NULL,
-   city VARCHAR(100) NOT NULL,
-   email VARCHAR(100) NOT NULL,
-   username VARCHAR(100) NOT NULL UNIQUE,
-   password VARCHAR(255) NOT NULL,
-   profile_picture VARCHAR(255),
-   user_type ENUM('jugador', 'editor', 'administrador'),
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+/* GENEROS (datos) */
+INSERT IGNORE INTO gender (type) VALUES
+        ('Masculino'),
+        ('Femenino'),
+        ('Prefiero no decirlo');
 
-INSERT INTO users (name, last_name, birth_date, gender, country, city, email, username, password, profile_picture, user_type) VALUES (
-     'Elena', 'Editor', '1990-05-15', 'Femenino', 'Argentina', 'Buenos Aires', 'elena.editor@example.com',
-  'editor1', '123', 'uploads/default.jpg', 'editor'
-    );
+/* ROLES (datos) */
+INSERT IGNORE INTO rol (type) VALUES
+        ('Administrador'),
+        ('Editor'),
+        ('Jugador');
 
-INSERT INTO users (
-    name, last_name, birth_date, gender, country, city, email,username, password, profile_picture, user_type) VALUES (
-             'Alan', 'Admin', '1985-02-20', 'Masculino', 'Argentina', 'Córdoba', 'alan.admin@example.com',
-             'admin1', '123', 'uploads/default.jpg', 'administrador'
-    );
+/* CATEGORIAS (datos) */
+INSERT IGNORE INTO categories (name, description) VALUES
+    ('Cultura General', 'Preguntas de cultura general'),
+    ('Ciencia', 'Preguntas sobre ciencia en general'),
+    ('Historia', 'Preguntas sobre hechos historicos');

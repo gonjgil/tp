@@ -23,12 +23,32 @@ class RegisterModel {
         return $stmt->num_rows > 0;
     }
 
-    public function createUser($name, $lastName, $birthDate, $gender, $country, $city, $email, $username, $hashedPassword, $profilePicture, $userType = 'jugador') {
-        $stmt = $this->database->prepare("INSERT INTO users (name, last_name, birth_date, gender, country, city, email, username, password, profile_picture, user_type)
-                                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssssssssss", $name, $lastName, $birthDate, $gender, $country, $city, $email, $username, $hashedPassword, $profilePicture, $userType);
+    public function createUser($name, $lastName, $birthDate, $gender, $country, $city, $email, $username, $password, $profilePicture, $idRol, $isActive, $lat, $lng) {
+        $idGender = intval($gender);
+
+        $stmt = $this->database->prepare("
+        INSERT INTO users 
+        (id_gender, id_rol, email, username, password, profile_picture, birth_date, name, last_name, is_active, country, city, lat, lng)
+        VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+    ");
+
+        $stmt->bind_param("iisssssssssidd", $idGender, $idRol, $email, $username, $password, $profilePicture, $birthDate, $name, $lastName, $isActive, $country, $city, $lat, $lng);
         return $stmt->execute();
     }
+
+    private function getGenderId($gender) {
+        switch (strtolower($gender)) {
+            case 'masculino':
+                return 1;
+            case 'femenino':
+                return 2;
+            default:
+                return 3;
+        }
+    }
+
 
 
 
