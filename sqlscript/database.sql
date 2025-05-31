@@ -58,9 +58,13 @@ CREATE TABLE IF NOT EXISTS questions (
     question_text VARCHAR(255) NOT NULL,
     approved TINYINT(1) NOT NULL DEFAULT 0,
     reported TINYINT(1) NOT NULL DEFAULT 0,
+    times_answered INT(11) NOT NULL DEFAULT 0,
+    times_incorrect INT(11) NOT NULL DEFAULT 0,
+    difficulty FLOAT NOT NULL DEFAULT 100,
     FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (creator_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 /* RESPUESTAS (tabla) */
 CREATE TABLE IF NOT EXISTS answers (

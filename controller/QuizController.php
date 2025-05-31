@@ -21,10 +21,14 @@ class QuizController {
             header("Location: /tp/quiz/finish");
             exit;
         }
+
         $questionId = $q['id'];
-        $opts       = $this->model->getOptionsByQuestion((int)$questionId);
-        $gameId  = $_SESSION['current_game'];
-        $score   = $this->model->getScore($gameId);
+        $this->model->incrementTimesAnsweredQuestions($questionId); // ver si esta bien
+
+        $opts   = $this->model->getOptionsByQuestion((int)$questionId);
+        $gameId = $_SESSION['current_game'];
+        $score  = $this->model->getScore($gameId);
+
         $this->view->render('question', [
             'question' => $q,
             'options'  => $opts,
@@ -32,16 +36,37 @@ class QuizController {
         ]);
     }
 
+
     public function answer() {
         $gameId     = $_SESSION['current_game'];
         $questionId = (int)$_POST['question_id'];
         $optionId   = (int)$_POST['answer'];
         $correct    = $this->model->checkCorrect($optionId);
-        if ($correct) $this->model->incrementScore($gameId);
+        $userId     = $_SESSION['user']['id'];
+
         $_SESSION['asked_questions'][] = $questionId;
-        header("Location: /tp/quiz/next");
+
+        $this->model->incrementTotalAnswersUser($userId);
+        if ($correct) {
+            $this->model->incrementScore($gameId);
+            $this->model->incrementCorrectAnswersUser($userId);
+        } else {
+            $this->model->incrementTimesIncorrectQuestions($questionId);
+        }
+
+        $this->model->updateDifficultyQuestions($questionId);      // pregunta
+        $this->model->updateUserDifficulty($userId);       // usuario
+
+        if ($correct) {
+            header("Location: /tp/quiz/next");
+        } else {
+            header("Location: /tp/quiz/finish");
+        }
         exit;
     }
+
+
+
 
     public function finish() {
         $gameId = $_SESSION['current_game'];
