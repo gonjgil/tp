@@ -106,4 +106,11 @@ class Configuration
             new PerfilUsuarioModel($this->getDatabase())
         );
     }
+
+       public function getQuizController()
+    {
+        $model = new QuizModel($this->getDatabase());
+        $view  = $this->getViewer();
+        return new QuizController($model, $view);
+    }
 }

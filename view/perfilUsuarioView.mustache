@@ -15,8 +15,29 @@
             <p><strong>Email:</strong> {{email}}</p>
             <p><strong>Tipo de usuario:</strong> {{user_type}}</p>
             <p><strong>Fecha de registro:</strong> {{created_at}}</p>
+            <p><strong>Ubicación:</strong></p>
+            <div id="map" style="height: 300px; border-radius: 10px;"></div>
         </div>
     </div>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var lat = {{#lat}}{{lat}}{{/lat}}{{^lat}}null{{/lat}};
+        var lng = {{#lng}}{{lng}}{{/lng}}{{^lng}}null{{/lng}};
 
+        if (!isNaN(lat) && !isNaN(lng)) {
+            var map = L.map('map').setView([lat, lng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+            }).addTo(map);
+
+            L.marker([lat, lng]).addTo(map)
+                    .bindPopup("Ubicación del usuario")
+                    .openPopup();
+        } else {
+            document.getElementById('map').innerHTML = "<p>Ubicación no disponible.</p>";
+        }
+    });
+</script>
