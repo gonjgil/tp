@@ -11,6 +11,7 @@ require_once ("controller/AdminController.php");
 require_once ("controller/EditorController.php");
 require_once ("controller/PlayerController.php");
 require_once ("controller/PerfilUsuarioController.php");
+require_once ("controller/QuizController.php");
 
 require_once("model/LoginModel.php");
 require_once("model/RegisterModel.php");
@@ -18,6 +19,7 @@ require_once("model/AdminModel.php");
 require_once("model/EditorModel.php");
 require_once("model/PlayerModel.php");
 require_once("model/PerfilUsuarioModel.php");
+require_once ("model/QuizModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
