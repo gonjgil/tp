@@ -1,0 +1,17 @@
+<h3>Ranking de Jugadores</h3>
+<table class="w3-table w3-bordered w3-striped">
+    <tr>
+        <th>Jugador</th>
+        <th>Respuestas Correctas</th>
+        <th>Respuestas Totales</th>
+        <th>Dificultad</th>
+    </tr>
+    {{#ranking}}
+        <tr>
+            <td><a href="/tp/ranking/profile/{{id}}">{{username}}</a></td>
+            <td>{{correct_answers}}</td>
+            <td>{{total_answers}}</td>
+            <td>{{difficulty}}</td>
+        </tr>
+    {{/ranking}}
+</table>
