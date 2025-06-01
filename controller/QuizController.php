@@ -17,17 +17,22 @@ class QuizController {
     public function next() {
         $asked = $_SESSION['asked_questions'] ?? [];
         $q = $this->model->getRandomQuestion($asked);
+
         if (!$q) {
             header("Location: /tp/quiz/finish");
             exit;
         }
 
         $questionId = $q['id'];
-        $this->model->incrementTimesAnsweredQuestions($questionId); // ver si esta bien
+        $this->model->incrementTimesAnsweredQuestions($questionId);
 
         $opts   = $this->model->getOptionsByQuestion((int)$questionId);
         $gameId = $_SESSION['current_game'];
         $score  = $this->model->getScore($gameId);
+
+        // dar color ver si funciona
+        $categoryClass = $this->getCategoryClass($q['category_name']);
+        $q['category_class'] = $categoryClass;
 
         $this->view->render('question', [
             'question' => $q,
@@ -66,6 +71,19 @@ class QuizController {
         exit;
     }
 
+
+    private function getCategoryClass(string $categoryName): string {
+        switch (strtolower($categoryName)) {
+            case 'cultura general':
+                return 'w3-red';
+            case 'ciencia':
+                return 'w3-blue';
+            case 'historia':
+                return 'w3-purple';
+            default:
+                return 'w3-grey';
+        }
+    }
 
 
 
