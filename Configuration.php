@@ -12,6 +12,7 @@ require_once ("controller/EditorController.php");
 require_once ("controller/PlayerController.php");
 require_once ("controller/PerfilUsuarioController.php");
 require_once ("controller/QuizController.php");
+require_once ("controller/RecordController.php");
 
 require_once("model/LoginModel.php");
 require_once("model/RegisterModel.php");
@@ -20,6 +21,7 @@ require_once("model/EditorModel.php");
 require_once("model/PlayerModel.php");
 require_once("model/PerfilUsuarioModel.php");
 require_once ("model/QuizModel.php");
+require_once("model/RecordModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -37,46 +39,39 @@ class Configuration
         );
     }
 
-    public function getIniConfig()
-    {
+    public function getIniConfig(){
         return parse_ini_file("configuration/config.ini", true);
     }
 
-    public function getHomeController()
-    {
+    public function getHomeController(){
         return new HomeController($this->getViewer());
     }
 
-    public function getRouter()
-    {
+    public function getRouter(){
         return new Router("getHomeController", "show", $this);
     }
 
-    public function getViewer()
-    {
+    public function getViewer(){
         //return new FileView();
         return new MustachePresenter("view");
     }
 
 
-    public function getLoginController()
-    {
+    public function getLoginController(){
         return new LoginController(
             $this->getViewer(),
             new LoginModel($this->getDatabase())
         );
     }
 
-    public function getRegisterController()
-    {
+    public function getRegisterController(){
         return new RegisterController(
             $this->getViewer(),
             new RegisterModel($this->getDatabase())
         );
     }
 
-    public function getPlayerController()
-    {
+    public function getPlayerController(){
         return new PlayerController(
             $this->getViewer(),
             new PlayerModel($this->getDatabase())
@@ -84,8 +79,7 @@ class Configuration
         );
     }
 
-    public function getEditorController()
-    {
+    public function getEditorController(){
         return new EditorController(
             $this->getViewer(),
             new EditorModel($this->getDatabase())
@@ -93,8 +87,7 @@ class Configuration
         );
     }
 
-    public function getAdminController()
-    {
+    public function getAdminController(){
         return new AdminController(
             $this->getViewer(),
             new AdminModel($this->getDatabase())
@@ -109,10 +102,15 @@ class Configuration
         );
     }
 
-       public function getQuizController()
-    {
+    public function getQuizController(){
         $model = new QuizModel($this->getDatabase());
         $view  = $this->getViewer();
         return new QuizController($model, $view);
+    }
+
+    public function getRecordController(){
+        $model = new RecordModel($this->getDatabase());
+        $view = $this->getViewer();
+        return new RecordController($view, $model);
     }
 }

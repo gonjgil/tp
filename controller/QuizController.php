@@ -47,6 +47,7 @@ class QuizController {
         $_SESSION['asked_questions'][] = $questionId;
 
         $this->model->incrementTotalAnswersUser($userId);
+        $this->model->incrementTotalQuestions($gameId);
         if ($correct) {
             $this->model->incrementScore($gameId);
             $this->model->incrementCorrectAnswersUser($userId);
@@ -72,6 +73,7 @@ class QuizController {
         $gameId = $_SESSION['current_game'];
         $score  = $this->model->getScore($gameId);
         $total  = $this->model->getTotalCorrectByUser($_SESSION['user']['id']);
+        $this->model->endGame($gameId);
         $this->view->render('quizSummary', compact('score','total'));
     }
 }

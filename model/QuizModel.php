@@ -12,22 +12,85 @@ class QuizModel {
         return (int)$insertId;
     }
 
-    public function getRandomQuestion(array $excludeIds) {
+
+    public function getRandomQuestion(array $excludeIds): ?array {
+        $userId = $_SESSION['user']['id'];
+
+        $userDifficulty = $this->getUserDifficulty($userId);
+        [$minDiff, $maxDiff] = $this->getDifficultyRangeForUser($userDifficulty);
+
+        $question = $this->findQuestionByDifficultyAndExclusion($minDiff, $maxDiff, $excludeIds);
+
+        if (!$question) {
+            $question = $this->findQuestionByDifficultyAndExclusion(0, 100, $excludeIds);
+        }
+
+        return $question;
+    }
+
+
+    public function getUserDifficulty(int $userId): float {
+        $sql = "SELECT difficulty FROM users WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        return $result ? (float)$result['difficulty'] : 0.2; // facil
+    }
+
+    public function getDifficultyRangeForUser(float $userDifficulty): array {
+        if ($userDifficulty <= 0.3) {
+            return [70, 100];
+        } else {
+            return [0, 30];
+        }
+    }
+
+
+//    public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []): ?array {
+//        $sql = "SELECT * FROM questions WHERE difficulty BETWEEN ? AND ?";
+//        $params = [$minDiff, $maxDiff];
+//        $types = "ii";
+//
+//        if (count($excludeIds)) {
+//            $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
+//            $sql .= " AND id NOT IN ($placeholders)";
+//            $types .= str_repeat('i', count($excludeIds));
+//            $params = array_merge($params, $excludeIds);
+//        }
+//
+//        $sql .= " ORDER BY RAND() LIMIT 1";
+//        $stmt = $this->db->prepare($sql);
+//        $stmt->bind_param($types, ...$params);
+//        $stmt->execute();
+//        return $stmt->get_result()->fetch_assoc() ?: null;
+//    }
+
+    public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []): ?array {
+        $sql = "SELECT q.*, c.name AS category_name FROM questions q JOIN categories c ON q.category_id = c.id WHERE q.difficulty BETWEEN ? AND ?";
+
+        $params = [$minDiff, $maxDiff];
+        $types = "ii";
+
         if (count($excludeIds)) {
             $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
-            $sql = "SELECT * FROM questions
-              WHERE id NOT IN ($placeholders)
-              ORDER BY RAND() LIMIT 1";
-            $stmt = $this->db->prepare($sql);
-            $types = str_repeat('i', count($excludeIds));
-            $stmt->bind_param($types, ...$excludeIds);
-        } else {
-            $sql = "SELECT * FROM questions ORDER BY RAND() LIMIT 1";
-            $stmt = $this->db->prepare($sql);
+            $sql .= " AND q.id NOT IN ($placeholders)";
+            $types .= str_repeat('i', count($excludeIds));
+            $params = array_merge($params, $excludeIds);
         }
+
+        $sql .= " ORDER BY RAND() LIMIT 1";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param($types, ...$params);
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc() ?: null;
     }
+
+
+
+
+
 
     public function getOptionsByQuestion(int $qid): array {
         $sql = "SELECT * FROM answers WHERE question_id = ? ORDER BY RAND()";
@@ -109,6 +172,21 @@ class QuizModel {
                 ELSE 1 END WHERE id = ?";
         $this->db->prepare($sql)->execute([$userId]);
     }
+
+    public function incrementTotalQuestions(int $gameId) {
+        $sql = "UPDATE games SET total_questions = total_questions + 1 WHERE id_game = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $gameId);
+        $stmt->execute();
+    }
+
+    public function endGame(int $gameId) {
+        $sql = "UPDATE games SET end_time = NOW() WHERE id_game = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $gameId);
+        $stmt->execute();
+    }
+
 
 
 }

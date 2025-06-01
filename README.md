@@ -15,3 +15,8 @@ cambios en el juego:
 - se agrego a la tabla preguntas 3 columnas : time_answered ,times_ incorrec , dificult
 - al aparecer una pregunta suma a la comuna correspondiente , si es incorrecta tambien y saca la % de dificultad
 - hace lo mismo con la tabla usuario
+
+cambios en el juego:
+- buscar respuesta en base el jugador
+- no se repite preguntas
+- busca dificultad

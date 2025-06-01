@@ -1,32 +1,38 @@
 <div class="container" style="margin-top:2rem">
 
-  <!-- CONTADOR DE PUNTOS -->
-  <div class="w3-panel w3-pale-blue w3-leftbar w3-border-blue">
-    <strong>Puntos:</strong> {{score}}
-  </div>
 
-  <h2 class="w3-text-orange">{{question.question_text}}</h2>
+    <div class="w3-panel w3-pale-blue w3-leftbar w3-border-blue">
+        <strong>Puntos:</strong> {{score}}
+    </div>
 
-  <form action="/tp/quiz/answer" method="post">
-    {{#options}}
-      <div class="w3-margin-bottom">
-        <input
-          type="radio"
-          id="opt{{id}}"
-          name="answer"
-          value="{{id}}"
-          class="w3-radio"
-          required
-        >
-        <label for="opt{{id}}" class="w3-validate">
-          {{answer_text}}
-        </label>
-      </div>
-    {{/options}}
 
-    <input type="hidden" name="question_id" value="{{question.id}}">
-    <button class="w3-button w3-orange" type="submit">
-      Enviar respuesta
-    </button>
-  </form>
+    <h2 class="w3-text-orange">{{question.question_text}}</h2>
+
+    <p>
+        <strong>Categoría:</strong> {{question.category_name}}<br>
+    </p>
+
+    <form action="/tp/quiz/answer" method="post">
+        {{#options}}
+            <div class="w3-margin-bottom">
+                <input
+                        type="radio"
+                        id="opt{{id}}"
+                        name="answer"
+                        value="{{id}}"
+                        class="w3-radio"
+                        required
+                >
+                <label for="opt{{id}}" class="w3-validate">
+                    {{answer_text}}
+                </label>
+            </div>
+        {{/options}}
+
+        <input type="hidden" name="question_id" value="{{question.id}}">
+        <button class="w3-button w3-orange" type="submit">
+            Enviar respuesta
+        </button>
+    </form>
+
 </div>
