@@ -1,38 +1,51 @@
-<div class="container" style="margin-top:2rem">
+<div class="w3-container" style="margin-top:70px">
+    <div class="w3-container" style="margin:auto; margin-top:2rem">
 
-
-    <div class="w3-panel w3-pale-blue w3-leftbar w3-border-blue">
-        <strong>Puntos:</strong> {{score}}
+    <!-- pregunta -->
+    <div class="w3-panel w3-amber w3-round-large w3-card-4 w3-padding-16">
+        <div class="w3-center w3-small">
+            <span class="w3-tag w3-white w3-round w3-text-blue">{{question.category_name}}</span>
+        <h2 class="w3-center"><b>{{question.question_text}}</b></h2>
+        </div>
     </div>
 
-
-    <h2 class="w3-text-orange">{{question.question_text}}</h2>
-
-    <p>
-        <strong>Categoría:</strong> {{question.category_name}}<br>
-    </p>
-
-    <form action="/tp/quiz/answer" method="post">
+    <!-- respuestas -->
+    <div class="w3-content" style="margin-top:70px">
+    <div class="w3-row-padding w3-margin-top">
         {{#options}}
-            <div class="w3-margin-bottom">
-                <input
-                        type="radio"
-                        id="opt{{id}}"
-                        name="answer"
-                        value="{{id}}"
-                        class="w3-radio"
-                        required
-                >
-                <label for="opt{{id}}" class="w3-validate">
-                    {{answer_text}}
+        <div class="w3-padding-large w3-half w3-margin-bottom">
+            <div class="w3-panel w3-deep-purple w3-round-large w3-card w3-padding-16" 
+                 style="height:100%; min-height:120px; display:flex; align-items:center; justify-content:center">
+                <label style="width:100%; cursor:pointer">
+                    <input type="radio" name="answer" value="{{id}}" class="w3-radio" required>
+                    <span class="w3-large">{{answer_text}}</span>
                 </label>
             </div>
+        </div>
         {{/options}}
+    </div>
+        </div>
 
-        <input type="hidden" name="question_id" value="{{question.id}}">
-        <button class="w3-button w3-orange" type="submit">
-            Enviar respuesta
-        </button>
-    </form>
+    <!-- puntaje -->
+    <div class="w3-content">
+    <div class="w3-row-padding w3-margin-top">
+    <div class="w3-padding-large w3-margin-bottom">
+        <form action="/tp/quiz/answer" method="post">
+            <div class="w3-row">
+                <div class="w3-half">
+                    <span class="w3-large"><strong>Puntos: {{score}}</span></strong>
+                </div>
+                <div class="w3-half w3-right-align">
+                    <input type="hidden" name="question_id" value="{{question.id}}">
+                    <button class="w3-button w3-green w3-round-large w3-padding" type="submit">
+                        <i class="fa fa-paper-plane"></i> Enviar respuesta
+                    </button>
+                </div>
+            </div>
+        </form>
+        </div>    
+        </div>    
+    </div>
 
+</div>
 </div>

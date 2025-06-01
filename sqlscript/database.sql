@@ -65,7 +65,6 @@ CREATE TABLE IF NOT EXISTS questions (
     FOREIGN KEY (creator_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
 /* RESPUESTAS (tabla) */
 CREATE TABLE IF NOT EXISTS answers (
     id INT AUTO_INCREMENT PRIMARY KEY,

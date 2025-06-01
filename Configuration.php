@@ -1,6 +1,5 @@
 <?php
 require_once("core/Database.php");
-require_once("core/FilePresenter.php");
 require_once("core/MustachePresenter.php");
 require_once("core/Router.php");
 
@@ -21,7 +20,7 @@ require_once("model/AdminModel.php");
 require_once("model/EditorModel.php");
 require_once("model/PlayerModel.php");
 require_once("model/PerfilUsuarioModel.php");
-require_once ("model/QuizModel.php");
+require_once("model/QuizModel.php");
 require_once("model/RecordModel.php");
 require_once ("model/RankingModel.php");
 
@@ -45,19 +44,19 @@ class Configuration
         return parse_ini_file("configuration/config.ini", true);
     }
 
-    public function getHomeController(){
-        return new HomeController($this->getViewer());
-    }
-
     public function getRouter(){
         return new Router("getHomeController", "show", $this);
     }
-
+    
     public function getViewer(){
         //return new FileView();
         return new MustachePresenter("view");
     }
-
+    
+    
+    public function getHomeController(){
+        return new HomeController($this->getViewer());
+    }
 
     public function getLoginController(){
         return new LoginController(

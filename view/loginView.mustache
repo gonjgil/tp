@@ -1,3 +1,7 @@
+<div class="logo-container">
+    <img src="./uploads/logo.svg" alt="Código Trivia Logo">
+</div>
+
 <div class="w3-display-middle" style="width: 100%; max-width: 400px;">
     <div class="w3-card w3-white w3-padding w3-round-large">
         <h2 class="w3-center">Iniciar sesión</h2>
@@ -10,13 +14,15 @@
 
         <form method="POST" action="/tp/login/handleLogin" class="w3-container">
             <p>
-                <input class="w3-input w3-border" type="text" name="username" placeholder="Nombre de usuario" required>
+                <label class="w3-large" for="username">Nombre de usuario</label>
+                <input class="label w3-input w3-border w3-button w3-round-xlarge w3-cobalt" type="text" name="username" required>
             </p>
             <p>
-                <input class="w3-input w3-border" type="password" name="password" placeholder="Contraseña" required>
+                <label class="w3-large" for="username">Contraseña</label>
+                <input class="label w3-input w3-border w3-button w3-round-xlarge w3-cobalt" type="password" name="password" required>
             </p>
             <p class="w3-center">
-                <button class="w3-button w3-black w3-round-large" type="submit">Ingresar</button>
+                <button class="w3-button w3-green w3-round-xxlarge" type="submit">Ingresar</button>
             </p>
         </form>
 
@@ -26,6 +32,4 @@
         </div>
     </div>
 </div>
-
-</body>
-</html>
+</div>

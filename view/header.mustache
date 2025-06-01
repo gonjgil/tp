@@ -4,21 +4,25 @@
     <title>Código Trivia</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="/tp/styles/style.css">
+    <link rel="stylesheet" href="/tp/styles/w3-win8-colors.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
-<body class="w3-display-container" style="height: 100vh;">
+<body class="w3-display-container {{#isLoginView}} w3-deep-purple {{/isLoginView}}" style="height: 100vh" >
+
+{{^isLoginView}}
 <div class="w3-top">
-    <div class="w3-bar w3-black w3-card">
-        <a href="/tp" class="w3-bar-item w3-button w3-padding-large">Código Trivia</a>
+  <div class="w3-bar w3-padding w3-card w3-deep-purple w3-text-white">
+        <a href="/tp" class="logo w3-bar-item w3-button">Código Trivia</a>
 
         {{^user}}
-            <div class="w3-right">
-                <a href="/tp/login" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Login</a>
-                <a href="/tp/register" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Registro</a>
+    <div class="w3-right w3-hide-small">
+                <a href="/tp/login" class="w3-bar-item w3-button">Login</a>
+                <a href="/tp/register" class="w3-bar-item w3-button">Registro</a>
             </div>
         {{/user}}
 
@@ -34,5 +38,4 @@
         {{/user}}
     </div>
 </div>
-
-<div class="w3-content" style="max-width:600px;margin-top:70px">
+{{/isLoginView}}

@@ -32,12 +32,13 @@ class MustachePresenter{
                     break;
             }
         }
-
-        echo $this->generateHtml($this->partialsPathLoader . '/' . $contentFile . "View.mustache", $data);
+        $data['isLoginView'] = ($contentFile === 'login');
+        $fullContentPath = $this->partialsPathLoader . '/' . $contentFile . "View.mustache";
+        echo $this->generateHtml($fullContentPath, $data);
     }
 
-
     public function generateHtml($contentFile, $data = array()) {
+        $contentAsString = '';
         $contentAsString = file_get_contents(  $this->partialsPathLoader .'/header.mustache');
         $contentAsString .= file_get_contents( $contentFile );
         $contentAsString .= file_get_contents($this->partialsPathLoader . '/footer.mustache');

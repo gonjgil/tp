@@ -9,7 +9,7 @@ Options -Indexes
     RewriteBase /tp/
 
     # Permitir acceso directo a public/ y uploads/
-    RewriteRule ^(public|uploads)($|/) - [L,NC]
+    RewriteRule ^(public|uploads|styles)($|/) - [L,NC]
 
     # Permitir archivos y carpetas existentes
     RewriteCond %{REQUEST_FILENAME} !-f

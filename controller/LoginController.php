@@ -65,6 +65,6 @@ class LoginController
     public function logout()
     {
         session_destroy();
-        header("Location: /tp/home/index");
+        header("Location: /tp");
     }
 }

@@ -16,7 +16,6 @@ class RegisterController
         $this->view->render('register');
     }
 
-
     public function handleRegister() {
         $data = $_POST;
         $username = $data['username'];

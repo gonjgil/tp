@@ -8,7 +8,7 @@ class QuizController {
 
     public function newGame() {
         $gameId = $this->model->startGame($_SESSION['user']['id']);
-        $_SESSION['current_game']     = $gameId;
+        $_SESSION['current_game'] = $gameId;
         $_SESSION['asked_questions'] = [];
         header("Location: /tp/quiz/next");
         exit;
@@ -16,7 +16,7 @@ class QuizController {
 
     public function next() {
         $asked = $_SESSION['asked_questions'] ?? [];
-        $q     = $this->model->getRandomQuestion($asked);
+        $q = $this->model->getRandomQuestion($asked);
         if (!$q) {
             header("Location: /tp/quiz/finish");
             exit;
