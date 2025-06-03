@@ -20,3 +20,23 @@ cambios en el juego:
 - buscar respuesta en base el jugador
 - no se repite preguntas
 - busca dificultad
+
+1/06
+Ahora hay 3 sql para cargar en orden: database -> usuarios -> preguntas
+
+/***************************************/
+OBSERVACIONES DE LA CLASE DEL 2 DE JUNIO
+* Agregar y corregi exit() despues de cada header(...)
+* Hay que armar el proyecto en una carpeta raiz / en lugar de /tp/
+* Sobre repetición de preguntas:
+    - Cuando un usuario vio todas las preguntas, se borra toda la lista de preguntas vistas asociada a ese usuario. Si ya pasaron todas las de su dificultad, queda a criterio de cada grupo si muestra de otra dificultad o se reinicia.
+    - Charlar sobre logica de dificultad (guardamos respondidas e incorrectas, y propone calcularlo sobre correctas)
+    - Ver que la dificultad se calcule recien despues de 10 preguntas (para dificultas de preguntas y de usuarios)
+* Tiempo y logica Anti-Cheat: 
+    - Hacer isset de la pregunta en la session. 
+    - Guardar en session del back, q pregunta le di, en que tiempo de que partida; y cada intereccion del usuario va a generar cambios sobre eso. Guarda el tiempo en que se hizo la pregunta, y cuando contesta pide el now para comparar si pasaron menos de 10 segundos.
+    - Que se muestre en el front
+* No se devuelve la correcta en la misma pantalla de la pregunta
+* Validación de email: ver screenshots. y pedirle a una IA que codee eso (dicho por el profe) y ver clase si es necesario
+* Hashear el password
+* Roles: validar sesion y baja y consultar (ver screenshots). Puede usarse un switch
