@@ -85,6 +85,16 @@ CREATE TABLE IF NOT EXISTS games (
     FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+/* PARTIDAS_PREGUNTAS (tabla) */
+CREATE TABLE IF NOT EXISTS game_questions (
+    id_game INT NOT NULL,
+    question_id INT NOT NULL,
+    answered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_game, question_id),
+    FOREIGN KEY (id_game) REFERENCES games(id_game) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 /* GENEROS (datos) */
 INSERT IGNORE INTO gender (type) VALUES
         ('Masculino'),

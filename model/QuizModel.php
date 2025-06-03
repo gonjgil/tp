@@ -13,20 +13,77 @@ class QuizModel {
     }
 
 
-    public function getRandomQuestion(array $excludeIds): ?array {
-        $userId = $_SESSION['user']['id'];
+//    public function getRandomQuestion(array $excludeIds): ?array {
+//        $userId = $_SESSION['user']['id'];
+//
+//        $userDifficulty = $this->getUserDifficulty($userId);
+//        [$minDiff, $maxDiff] = $this->getDifficultyRangeForUser($userDifficulty);
+//
+//        $question = $this->findQuestionByDifficultyAndExclusion($minDiff, $maxDiff, $excludeIds);
+//
+//        if (!$question) {
+//            $question = $this->findQuestionByDifficultyAndExclusion(0, 100, $excludeIds);
+//        }
+//
+//        return $question;
+//    }
 
+    public function getRandomQuestion(array $excludeSession): ?array {
+        $userId = $_SESSION['user']['id'];
         $userDifficulty = $this->getUserDifficulty($userId);
         [$minDiff, $maxDiff] = $this->getDifficultyRangeForUser($userDifficulty);
+
+        //--- NUEVO: obtener preguntas respondidas por el usuario históricamente
+        $excludeDb = $this->getQuestionsAlreadyAnsweredByUser($userId);
+        $excludeIds = array_unique(array_merge($excludeSession, $excludeDb));
 
         $question = $this->findQuestionByDifficultyAndExclusion($minDiff, $maxDiff, $excludeIds);
 
         if (!$question) {
             $question = $this->findQuestionByDifficultyAndExclusion(0, 100, $excludeIds);
+
+            //--- NUEVO: si no quedan más preguntas, reinicia historial
+            if (!$question) {
+                $this->clearUserQuestionHistory($userId);
+                $excludeIds = $excludeSession; // solo esta sesión
+                $question = $this->findQuestionByDifficultyAndExclusion($minDiff, $maxDiff, $excludeIds);
+            }
         }
 
         return $question;
     }
+
+//--- NUEVO: obtener historial de preguntas ya jugadas por el usuario
+    private function getQuestionsAlreadyAnsweredByUser(int $userId): array {
+        $sql = "SELECT DISTINCT q.question_id
+            FROM game_questions q
+            JOIN games g ON q.id_game = g.id_game
+            WHERE g.user_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        return array_column($result, 'question_id');
+    }
+
+//--- NUEVO: limpiar historial (si respondió todo)
+    private function clearUserQuestionHistory(int $userId) {
+        $sql = "DELETE q FROM game_questions q
+            JOIN games g ON q.id_game = g.id_game
+            WHERE g.user_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+    }
+
+//--- NUEVO: guardar la pregunta respondida en el juego actual
+    public function saveQuestionToGame(int $gameId, int $questionId) {
+        $sql = "INSERT IGNORE INTO game_questions (id_game, question_id) VALUES (?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("ii", $gameId, $questionId);
+        $stmt->execute();
+    }
+
 
 
     public function getUserDifficulty(int $userId): float {
@@ -47,24 +104,6 @@ class QuizModel {
     }
 
 
-//    public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []): ?array {
-//        $sql = "SELECT * FROM questions WHERE difficulty BETWEEN ? AND ?";
-//        $params = [$minDiff, $maxDiff];
-//        $types = "ii";
-//
-//        if (count($excludeIds)) {
-//            $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
-//            $sql .= " AND id NOT IN ($placeholders)";
-//            $types .= str_repeat('i', count($excludeIds));
-//            $params = array_merge($params, $excludeIds);
-//        }
-//
-//        $sql .= " ORDER BY RAND() LIMIT 1";
-//        $stmt = $this->db->prepare($sql);
-//        $stmt->bind_param($types, ...$params);
-//        $stmt->execute();
-//        return $stmt->get_result()->fetch_assoc() ?: null;
-//    }
 
     public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []): ?array {
         $sql = "SELECT q.*, c.name AS category_name FROM questions q JOIN categories c ON q.category_id = c.id WHERE q.difficulty BETWEEN ? AND ?";

@@ -11,7 +11,7 @@ class QuizController {
         $_SESSION['current_game'] = $gameId;
         $_SESSION['asked_questions'] = [];
         header("Location: /tp/quiz/next");
-        exit();
+        exit;
     }
 
     public function next() {
@@ -20,7 +20,7 @@ class QuizController {
 
         if (!$q) {
             header("Location: /tp/quiz/finish");
-            exit();
+            exit;
         }
 
         $questionId = $q['id'];
@@ -42,6 +42,35 @@ class QuizController {
     }
 
 
+//    public function answer() {
+//        $gameId     = $_SESSION['current_game'];
+//        $questionId = (int)$_POST['question_id'];
+//        $optionId   = (int)$_POST['answer'];
+//        $correct    = $this->model->checkCorrect($optionId);
+//        $userId     = $_SESSION['user']['id'];
+//
+//        $_SESSION['asked_questions'][] = $questionId;
+//
+//        $this->model->incrementTotalAnswersUser($userId);
+//        $this->model->incrementTotalQuestions($gameId);
+//        if ($correct) {
+//            $this->model->incrementScore($gameId);
+//            $this->model->incrementCorrectAnswersUser($userId);
+//        } else {
+//            $this->model->incrementTimesIncorrectQuestions($questionId);
+//        }
+//
+//        $this->model->updateDifficultyQuestions($questionId);      // pregunta
+//        $this->model->updateUserDifficulty($userId);       // usuario
+//
+//        if ($correct) {
+//            header("Location: /tp/quiz/next");
+//        } else {
+//            header("Location: /tp/quiz/finish");
+//        }
+//        exit;
+//    }
+
     public function answer() {
         $gameId     = $_SESSION['current_game'];
         $questionId = (int)$_POST['question_id'];
@@ -50,6 +79,8 @@ class QuizController {
         $userId     = $_SESSION['user']['id'];
 
         $_SESSION['asked_questions'][] = $questionId;
+
+        $this->model->saveQuestionToGame($gameId, $questionId); //--- NUEVO: registrar pregunta en game_questions
 
         $this->model->incrementTotalAnswersUser($userId);
         $this->model->incrementTotalQuestions($gameId);
@@ -60,18 +91,17 @@ class QuizController {
             $this->model->incrementTimesIncorrectQuestions($questionId);
         }
 
-        $this->model->updateDifficultyQuestions($questionId);      // pregunta
-        $this->model->updateUserDifficulty($userId);       // usuario
+        $this->model->updateDifficultyQuestions($questionId);
+        $this->model->updateUserDifficulty($userId);
 
         if ($correct) {
             header("Location: /tp/quiz/next");
-            exit();
         } else {
             header("Location: /tp/quiz/finish");
-            exit();
         }
         exit;
     }
+
 
 
     private function getCategoryClass(string $categoryName): string {
