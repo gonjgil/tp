@@ -20,7 +20,7 @@ class AdminController{
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['user_type'] !== 'administrador') {
             header("Location: /tp/login");
-            exit;
+            exit();
         }
         $this->model->render("admin");
     }

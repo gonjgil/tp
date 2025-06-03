@@ -11,7 +11,7 @@ class QuizController {
         $_SESSION['current_game'] = $gameId;
         $_SESSION['asked_questions'] = [];
         header("Location: /tp/quiz/next");
-        exit;
+        exit();
     }
 
     public function next() {
@@ -20,7 +20,7 @@ class QuizController {
 
         if (!$q) {
             header("Location: /tp/quiz/finish");
-            exit;
+            exit();
         }
 
         $questionId = $q['id'];
@@ -65,8 +65,10 @@ class QuizController {
 
         if ($correct) {
             header("Location: /tp/quiz/next");
+            exit();
         } else {
             header("Location: /tp/quiz/finish");
+            exit();
         }
         exit;
     }

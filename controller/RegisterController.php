@@ -16,7 +16,8 @@ class RegisterController
         $this->view->render('register');
     }
 
-    public function handleRegister() {
+    public function handleRegister()
+    {
         $data = $_POST;
         $username = $data['username'];
 
@@ -47,17 +48,14 @@ class RegisterController
             );
 
             header("Location: /tp/login");
-            exit;
+            exit();
         } else {
             $this->view->render("register", ['errors' => $errors]);
         }
     }
 
-
-
-
-
-    private function validateRegistrationData($data) {
+    private function validateRegistrationData($data)
+    {
         $errors = [];
 
         if (!preg_match("/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/", $data['name'])) {
@@ -87,7 +85,8 @@ class RegisterController
         return $errors;
     }
 
-    private function ProfilePictureUpload($file, $username) {
+    private function ProfilePictureUpload($file, $username)
+    {
         if ($file && $file['error'] === UPLOAD_ERR_OK) {
             $uploadDir = "uploads/";
 
@@ -104,5 +103,4 @@ class RegisterController
 
         return null;
     }
-
 }

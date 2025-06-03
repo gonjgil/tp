@@ -16,7 +16,8 @@ class LoginController
         $this->view->render('login');
     }
 
-    public function handleLogin() {
+    public function handleLogin()
+    {
         $username = $_POST['username'];
         $password = $_POST['password'];
 
@@ -48,23 +49,27 @@ class LoginController
         switch ($user['user_type']) {
             case 'jugador':
                 header("Location: /tp/player/panel");
+                exit();
                 break;
             case 'editor':
                 header("Location: /tp/editor/panel");
+                exit();
                 break;
             case 'administrador':
                 header("Location: /tp/admin/panel");
+                exit();
                 break;
             default:
                 header("Location: /tp/login");
+                exit();
                 break;
         }
     }
-
 
     public function logout()
     {
         session_destroy();
         header("Location: /tp");
+        exit();
     }
 }

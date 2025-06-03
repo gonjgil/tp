@@ -20,7 +20,7 @@ class PlayerController{
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['user_type'] !== 'jugador') {
             header("Location: /tp/login");
-            exit;
+            exit();
         }
         $this->model->render("player");
     }

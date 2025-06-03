@@ -19,7 +19,7 @@ class PerfilUsuarioController
 
         if (!isset($_SESSION['user'])) {
             header("Location: /tp/login");
-            exit;
+            exit();
         }
 
         $id = $_SESSION['user']['id'];

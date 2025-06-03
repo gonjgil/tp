@@ -3,7 +3,7 @@ require_once("core/Database.php");
 require_once("core/MustachePresenter.php");
 require_once("core/Router.php");
 
-require_once("controller/HomeController.php");
+require_once ("controller/HomeController.php");
 require_once ("controller/LoginController.php");
 require_once ("controller/RegisterController.php");
 require_once ("controller/AdminController.php");
