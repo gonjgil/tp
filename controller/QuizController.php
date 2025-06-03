@@ -80,7 +80,7 @@ class QuizController {
 
         $_SESSION['asked_questions'][] = $questionId;
 
-        $this->model->saveQuestionToGame($gameId, $questionId); //--- NUEVO: registrar pregunta en game_questions
+        $this->model->saveQuestionToGame($gameId, $questionId); // registrar pregunta
 
         $this->model->incrementTotalAnswersUser($userId);
         $this->model->incrementTotalQuestions($gameId);
