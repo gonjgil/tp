@@ -1,0 +1,35 @@
+<div class="logo-container">
+    <img src="./uploads/logo.svg" alt="Código Trivia Logo">
+</div>
+
+<div class="w3-display-middle" style="width: 100%; max-width: 400px;">
+    <div class="w3-card w3-white w3-padding w3-round-large">
+        <h2 class="w3-center">Iniciar sesión</h2>
+
+        {{#error}}
+            <div class="w3-panel w3-red w3-padding-small w3-center">
+                {{.}}
+            </div>
+        {{/error}}
+
+        <form method="POST" action="/tp/login/handleLogin" class="w3-container">
+            <p>
+                <label class="w3-large" for="username">Nombre de usuario</label>
+                <input class="label w3-input w3-border w3-button w3-round-xlarge w3-cobalt" type="text" name="username" required>
+            </p>
+            <p>
+                <label class="w3-large" for="username">Contraseña</label>
+                <input class="label w3-input w3-border w3-button w3-round-xlarge w3-cobalt" type="password" name="password" required>
+            </p>
+            <p class="w3-center">
+                <button class="w3-button w3-green w3-round-xxlarge" type="submit">Ingresar</button>
+            </p>
+        </form>
+
+        <div class="w3-center w3-small">
+            <p><a href="#" class="w3-text-blue">¿Olvidaste tu contraseña?</a></p>
+            <p>¿No posees cuenta? <a href="/tp/register" class="w3-text-blue">Regístrate</a></p>
+        </div>
+    </div>
+</div>
+</div>
