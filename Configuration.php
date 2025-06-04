@@ -121,4 +121,14 @@ class Configuration
         return new RankingController($model, $view);
     }
 
+    public function getCrearPreguntaController() {
+        require_once("controller/CrearPreguntaController.php");
+        require_once("model/CrearPreguntaModel.php");
+
+        $model = new CrearPreguntaModel($this->getDatabase());
+        $view = $this->getViewer();
+        return new CrearPreguntaController($model, $view);
+    }
+
+
 }
