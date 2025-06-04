@@ -11,7 +11,7 @@ class QuizController {
         $_SESSION['current_game'] = $gameId;
         $_SESSION['asked_questions'] = [];
         header("Location: /tp/quiz/next");
-        exit;
+        exit();
     }
 
     public function next() {
@@ -75,7 +75,7 @@ class QuizController {
         } else {
             header("Location: /tp/quiz/finish");
         }
-        exit;
+        exit();
     }
 
 
@@ -92,8 +92,6 @@ class QuizController {
                 return 'w3-grey';
         }
     }
-
-
 
     public function finish() {
         $gameId = $_SESSION['current_game'];

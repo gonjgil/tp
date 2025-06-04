@@ -1,0 +1,19 @@
+{
+  "public": {
+    "login": [],
+    "home": [],
+    "register": []
+  },
+  "player": {
+    "player": [],
+    "perfilusuario": [],
+    "quiz": [],
+    "ranking": []
+  },
+  "editor": {
+    "editor": []
+  },
+  "admin": {
+    "admin": []
+  }
+}

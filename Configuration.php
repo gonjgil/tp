@@ -22,7 +22,7 @@ require_once("model/PlayerModel.php");
 require_once("model/PerfilUsuarioModel.php");
 require_once("model/QuizModel.php");
 require_once("model/RecordModel.php");
-require_once ("model/RankingModel.php");
+require_once("model/RankingModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -49,7 +49,6 @@ class Configuration
     }
     
     public function getViewer(){
-        //return new FileView();
         return new MustachePresenter("view");
     }
     

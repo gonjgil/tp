@@ -18,7 +18,7 @@ class AdminController{
 
     public function panel()
     {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['user_type'] !== 'administrador') {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['user_type'] !== 'admin') {
             header("Location: /tp/login");
             exit();
         }

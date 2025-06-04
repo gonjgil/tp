@@ -18,13 +18,13 @@ class MustachePresenter{
             $data['user'] = $_SESSION['user'];
 
             switch ($_SESSION['user']['user_type']) {
-                case 'jugador':
+                case 'player':
                     $data['panelUrl'] = '/tp/player/panel';
                     break;
                 case 'editor':
                     $data['panelUrl'] = '/tp/editor/panel';
                     break;
-                case 'administrador':
+                case 'admin':
                     $data['panelUrl'] = '/tp/admin/panel';
                     break;
                 default:

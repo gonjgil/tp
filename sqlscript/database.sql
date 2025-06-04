@@ -103,9 +103,9 @@ INSERT IGNORE INTO gender (type) VALUES
 
 /* ROLES (datos) */
 INSERT IGNORE INTO rol (type) VALUES
-        ('Administrador'),
-        ('Editor'),
-        ('Jugador');
+        ('admin'),
+        ('editor'),
+        ('player');
 
 /* CATEGORIAS (datos) */
 INSERT IGNORE INTO categories (name, description) VALUES
