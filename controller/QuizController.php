@@ -19,10 +19,17 @@ class QuizController {
         $q = $this->model->getRandomQuestion($asked);
 
         if (!$q) {
-            header("Location: /tp/quiz/finish");
-            exit;
+            $this->model->clearUserQuestionHistory($_SESSION['user']['id']);
+            $_SESSION['asked_questions'] = [];
+            $q = $this->model->getRandomQuestion([]); // intentar de nuevo sin exclusiones
         }
 
+        if (!$q) {
+            $this->view->render('error', ['message' => 'No hay preguntas disponibles.']);
+            return;
+        }
+
+        $_SESSION['asked_questions'][] = $q['id'];
         $questionId = $q['id'];
         $this->model->incrementTimesAnsweredQuestions($questionId);
 
@@ -30,7 +37,6 @@ class QuizController {
         $gameId = $_SESSION['current_game'];
         $score  = $this->model->getScore($gameId);
 
-        // dar color ver si funciona
         $categoryClass = $this->getCategoryClass($q['category_name']);
         $q['category_class'] = $categoryClass;
 
@@ -40,36 +46,6 @@ class QuizController {
             'score'    => $score,
         ]);
     }
-
-
-//    public function answer() {
-//        $gameId     = $_SESSION['current_game'];
-//        $questionId = (int)$_POST['question_id'];
-//        $optionId   = (int)$_POST['answer'];
-//        $correct    = $this->model->checkCorrect($optionId);
-//        $userId     = $_SESSION['user']['id'];
-//
-//        $_SESSION['asked_questions'][] = $questionId;
-//
-//        $this->model->incrementTotalAnswersUser($userId);
-//        $this->model->incrementTotalQuestions($gameId);
-//        if ($correct) {
-//            $this->model->incrementScore($gameId);
-//            $this->model->incrementCorrectAnswersUser($userId);
-//        } else {
-//            $this->model->incrementTimesIncorrectQuestions($questionId);
-//        }
-//
-//        $this->model->updateDifficultyQuestions($questionId);      // pregunta
-//        $this->model->updateUserDifficulty($userId);       // usuario
-//
-//        if ($correct) {
-//            header("Location: /tp/quiz/next");
-//        } else {
-//            header("Location: /tp/quiz/finish");
-//        }
-//        exit;
-//    }
 
     public function answer() {
         $gameId     = $_SESSION['current_game'];

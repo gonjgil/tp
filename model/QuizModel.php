@@ -12,49 +12,32 @@ class QuizModel {
         return (int)$insertId;
     }
 
-
-//    public function getRandomQuestion(array $excludeIds): ?array {
-//        $userId = $_SESSION['user']['id'];
-//
-//        $userDifficulty = $this->getUserDifficulty($userId);
-//        [$minDiff, $maxDiff] = $this->getDifficultyRangeForUser($userDifficulty);
-//
-//        $question = $this->findQuestionByDifficultyAndExclusion($minDiff, $maxDiff, $excludeIds);
-//
-//        if (!$question) {
-//            $question = $this->findQuestionByDifficultyAndExclusion(0, 100, $excludeIds);
-//        }
-//
-//        return $question;
-//    }
-
-    public function getRandomQuestion(array $excludeSession): ?array {
+    public function getRandomQuestion(array $excludeSession, bool $forceReset = false){
         $userId = $_SESSION['user']['id'];
         $userDifficulty = $this->getUserDifficulty($userId);
         [$minDiff, $maxDiff] = $this->getDifficultyRangeForUser($userDifficulty);
 
-        //--- NUEVO: obtener preguntas respondidas por el usuario históricamente
-        $excludeDb = $this->getQuestionsAlreadyAnsweredByUser($userId);
-        $excludeIds = array_unique(array_merge($excludeSession, $excludeDb));
+        if ($forceReset) {
+            $this->clearUserQuestionHistory($userId);
+            $_SESSION['asked_questions'] = [];
+            $excludeIds = []; // permitir todas
+        } else {
+            $excludeDb  = $this->getQuestionsAlreadyAnsweredByUser($userId);
+            $excludeIds = array_unique(array_merge($excludeSession, $excludeDb));
+        }
 
         $question = $this->findQuestionByDifficultyAndExclusion($minDiff, $maxDiff, $excludeIds);
 
         if (!$question) {
             $question = $this->findQuestionByDifficultyAndExclusion(0, 100, $excludeIds);
-
-            //--- NUEVO: si no quedan más preguntas, reinicia historial
-            if (!$question) {
-                $this->clearUserQuestionHistory($userId);
-                $excludeIds = $excludeSession; // solo esta sesión
-                $question = $this->findQuestionByDifficultyAndExclusion($minDiff, $maxDiff, $excludeIds);
-            }
         }
 
         return $question;
     }
 
+
 //-
-    private function getQuestionsAlreadyAnsweredByUser(int $userId): array {
+    private function getQuestionsAlreadyAnsweredByUser(int $userId){
         $sql = "SELECT DISTINCT q.question_id
             FROM game_questions q
             JOIN games g ON q.id_game = g.id_game
@@ -67,7 +50,7 @@ class QuizModel {
     }
 
 //-
-    private function clearUserQuestionHistory(int $userId) {
+    public function clearUserQuestionHistory(int $userId) {
         $sql = "DELETE q FROM game_questions q
             JOIN games g ON q.id_game = g.id_game
             WHERE g.user_id = ?";
@@ -86,7 +69,7 @@ class QuizModel {
 
 
 
-    public function getUserDifficulty(int $userId): float {
+    public function getUserDifficulty(int $userId){
         $sql = "SELECT difficulty FROM users WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $userId);
@@ -103,9 +86,7 @@ class QuizModel {
         }
     }
 
-
-
-    public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []): ?array {
+    public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []){
         $sql = "SELECT q.*, c.name AS category_name FROM questions q JOIN categories c ON q.category_id = c.id WHERE q.difficulty BETWEEN ? AND ?";
 
         $params = [$minDiff, $maxDiff];
@@ -126,12 +107,7 @@ class QuizModel {
         return $stmt->get_result()->fetch_assoc() ?: null;
     }
 
-
-
-
-
-
-    public function getOptionsByQuestion(int $qid): array {
+    public function getOptionsByQuestion(int $qid){
         $sql = "SELECT * FROM answers WHERE question_id = ? ORDER BY RAND()";
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $qid);
@@ -157,7 +133,7 @@ class QuizModel {
         $stmt->execute();
     }
 
-    public function getScore(int $gameId): int {
+    public function getScore(int $gameId){
         $sql = "SELECT correct_answers FROM games WHERE id_game = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $gameId);
@@ -166,7 +142,7 @@ class QuizModel {
         return $row ? (int)$row['correct_answers'] : 0;
     }
 
-    public function getTotalCorrectByUser(int $userId): int {
+    public function getTotalCorrectByUser(int $userId){
         $sql = "SELECT COALESCE(SUM(correct_answers),0) AS total
             FROM games
             WHERE user_id = ?";
@@ -207,8 +183,8 @@ class QuizModel {
 
 
     public function updateUserDifficulty(int $userId){
-        $sql = "UPDATE users SET difficulty = CASE WHEN total_answers > 0 THEN (1 - (correct_answers / total_answers))
-                ELSE 1 END WHERE id = ?";
+        $sql = "UPDATE users SET difficulty = CASE WHEN total_answers >= 6 THEN (1 - (correct_answers / total_answers))
+                ELSE difficulty END WHERE id = ?";
         $this->db->prepare($sql)->execute([$userId]);
     }
 
