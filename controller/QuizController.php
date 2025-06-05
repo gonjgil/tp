@@ -43,7 +43,6 @@ class QuizController {
             unset($_SESSION['question_start_time']);
             unset($_SESSION['current_question_id']);
 
-            // Poner el motivo 'timeout' antes de ir a finish
             $_SESSION['finish_reason'] = 'timeout';
 
             header("Location: /tp/quiz/finish");
@@ -69,7 +68,6 @@ class QuizController {
         } else {
             $this->model->incrementTimesIncorrectQuestions($questionId);
 
-            // Poner el motivo 'wrong' antes de ir a finish
             $_SESSION['finish_reason'] = 'wrong';
         }
 
@@ -82,7 +80,7 @@ class QuizController {
         if ($correct) {
             header("Location: /tp/quiz/next");
         } else {
-            $this->model->endGame($gameId);  // también cerrar la partida acá si querés
+            $this->model->endGame($gameId);
             header("Location: /tp/quiz/finish");
         }
         exit();
