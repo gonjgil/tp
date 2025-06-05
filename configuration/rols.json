@@ -2,13 +2,14 @@
   "public": {
     "login": [],
     "home": [],
-    "register": []
+    "register": [],
+    "perfilusuario": []
   },
   "player": {
     "player": [],
-    "perfilusuario": [],
     "quiz": [],
-    "ranking": []
+    "ranking": [],
+    "record": []
   },
   "editor": {
     "editor": []
