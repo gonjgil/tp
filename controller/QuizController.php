@@ -10,44 +10,46 @@ class QuizController {
         $gameId = $this->model->startGame($_SESSION['user']['id']);
         $_SESSION['current_game'] = $gameId;
         $_SESSION['asked_questions'] = [];
+        unset($_SESSION['question_start_time']);
         header("Location: /tp/quiz/next");
         exit();
     }
 
     public function next() {
-        $asked = $_SESSION['asked_questions'] ?? [];
-        $q = $this->model->getRandomQuestion($asked);
+        $this->handleQuestionTimeout();
 
-        if (!$q) {
-            $this->model->clearUserQuestionHistory($_SESSION['user']['id']);
-            $_SESSION['asked_questions'] = [];
-            $q = $this->model->getRandomQuestion([]); // intentar de nuevo sin exclusiones
+        if ($this->renderCurrentQuestionIfExists()) {
+            return;
         }
+
+        $q = $this->getNextAvailableQuestion();
 
         if (!$q) {
             $this->view->render('error', ['message' => 'No hay preguntas disponibles.']);
             return;
         }
 
-        $_SESSION['asked_questions'][] = $q['id'];
-        $questionId = $q['id'];
-        $this->model->incrementTimesAnsweredQuestions($questionId);
-
-        $opts   = $this->model->getOptionsByQuestion((int)$questionId);
-        $gameId = $_SESSION['current_game'];
-        $score  = $this->model->getScore($gameId);
-
-        $categoryClass = $this->getCategoryClass($q['category_name']);
-        $q['category_class'] = $categoryClass;
-
-        $this->view->render('question', [
-            'question' => $q,
-            'options'  => $opts,
-            'score'    => $score,
-        ]);
+        $this->renderNewQuestion($q);
     }
 
     public function answer() {
+        if (!isset($_SESSION['question_start_time']) || !isset($_SESSION['current_question_id'])) {
+            header("Location: /tp/quiz/finish");
+            exit();
+        }
+
+        $elapsed = time() - $_SESSION['question_start_time'];
+        if ($elapsed > 15) {
+            unset($_SESSION['question_start_time']);
+            unset($_SESSION['current_question_id']);
+
+            // Poner el motivo 'timeout' antes de ir a finish
+            $_SESSION['finish_reason'] = 'timeout';
+
+            header("Location: /tp/quiz/finish");
+            exit();
+        }
+
         $gameId     = $_SESSION['current_game'];
         $questionId = (int)$_POST['question_id'];
         $optionId   = (int)$_POST['answer'];
@@ -60,22 +62,101 @@ class QuizController {
 
         $this->model->incrementTotalAnswersUser($userId);
         $this->model->incrementTotalQuestions($gameId);
+
         if ($correct) {
             $this->model->incrementScore($gameId);
             $this->model->incrementCorrectAnswersUser($userId);
         } else {
             $this->model->incrementTimesIncorrectQuestions($questionId);
+
+            // Poner el motivo 'wrong' antes de ir a finish
+            $_SESSION['finish_reason'] = 'wrong';
         }
 
         $this->model->updateDifficultyQuestions($questionId);
         $this->model->updateUserDifficulty($userId);
 
+        unset($_SESSION['question_start_time']);
+        unset($_SESSION['current_question_id']);
+
         if ($correct) {
             header("Location: /tp/quiz/next");
         } else {
+            $this->model->endGame($gameId);  // también cerrar la partida acá si querés
             header("Location: /tp/quiz/finish");
         }
         exit();
+    }
+
+
+    private function handleQuestionTimeout(): bool {
+        if (isset($_SESSION['question_start_time'])) {
+            $elapsed = time() - $_SESSION['question_start_time'];
+            if ($elapsed > 10) {
+                unset($_SESSION['question_start_time']);
+                unset($_SESSION['current_question_id']);
+                header("Location: /tp/quiz/finish");
+                exit();
+            }
+        }
+        return false;
+    }
+
+    private function renderCurrentQuestionIfExists(): bool {
+        if (isset($_SESSION['current_question_id'])) {
+            $questionId = $_SESSION['current_question_id'];
+            $q = $this->model->getQuestionById($questionId);
+            if (!$q) {
+                $this->view->render('error', ['message' => 'Pregunta no encontrada.']);
+                return true;
+            }
+
+            $opts = $this->model->getOptionsByQuestion($questionId);
+            $gameId = $_SESSION['current_game'];
+            $score = $this->model->getScore($gameId);
+            $q['category_class'] = $this->getCategoryClass($q['category_name']);
+
+            $this->view->render('question', [
+                'question' => $q,
+                'options'  => $opts,
+                'score'    => $score,
+                'question_start_time' => $_SESSION['question_start_time'],
+            ]);
+            return true;
+        }
+
+        return false;
+    }
+
+    private function getNextAvailableQuestion(): ?array {
+        $asked = $_SESSION['asked_questions'] ?? [];
+        $q = $this->model->getRandomQuestion($asked);
+
+        if (!$q) {
+            $this->model->clearUserQuestionHistory($_SESSION['user']['id']);
+            $_SESSION['asked_questions'] = [];
+            $q = $this->model->getRandomQuestion([]);
+        }
+
+        return $q;
+    }
+
+    private function renderNewQuestion(array $q): void {
+        $_SESSION['asked_questions'][] = $q['id'];
+        $_SESSION['current_question_id'] = $q['id'];
+        $_SESSION['question_start_time'] = time();
+
+        $this->model->incrementTimesAnsweredQuestions($q['id']);
+        $opts  = $this->model->getOptionsByQuestion($q['id']);
+        $score = $this->model->getScore($_SESSION['current_game']);
+        $q['category_class'] = $this->getCategoryClass($q['category_name']);
+
+        $this->view->render('question', [
+            'question' => $q,
+            'options'  => $opts,
+            'score'    => $score,
+            'question_start_time' => $_SESSION['question_start_time'],
+        ]);
     }
 
 
@@ -93,11 +174,33 @@ class QuizController {
         }
     }
 
+
     public function finish() {
-        $gameId = $_SESSION['current_game'];
-        $score  = $this->model->getScore($gameId);
-        $total  = $this->model->getTotalCorrectByUser($_SESSION['user']['id']);
-        $this->model->endGame($gameId);
-        $this->view->render('quizSummary', compact('score','total'));
+        $score = $this->model->getScore($_SESSION['current_game']);
+        $total = $this->model->getTotalCorrectByUser($_SESSION['user']['id']);
+
+        $reason = isset($_SESSION['finish_reason']) ? $_SESSION['finish_reason'] : null;
+        unset($_SESSION['finish_reason']); // limpia tiempo
+
+        $reasonText = '';
+        switch ($reason) {
+            case 'wrong':
+                $reasonText = 'Respuesta incorrecta';
+                break;
+            case 'timeout':
+                $reasonText = 'Su tiempo se termino';
+                break;
+            default:
+                $reasonText = 'Partida finalizada';
+                break;
+        }
+
+        $this->view->render('quizsummary', [
+            'score'  => $score,
+            'total'  => $total,
+            'reason' => $reasonText,
+        ]);
     }
+
+
 }

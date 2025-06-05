@@ -198,6 +198,15 @@ class QuizModel {
         $stmt->execute();
     }
 
+    public function getQuestionById(int $id) {
+        $sql = "SELECT q.*, c.name AS category_name FROM questions q JOIN categories c ON q.category_id = c.id WHERE q.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
+
 
 
 }
