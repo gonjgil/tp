@@ -15,8 +15,26 @@ class Router
 
     public function go($controllerName, $methodName)
     {
+
         $controller = $this->getControllerFrom($controllerName);
-        $this->executeMethodFromController($controller, $methodName);
+
+
+        $uri      = trim($_SERVER['REQUEST_URI'], '/');
+        $segments = explode('/', $uri);
+        //     segments[0] = "tp"
+        //     segments[1] = "perfilUsuario"
+        //     segments[2] = "show"
+        //     segments[3] = "4"
+
+
+        if (isset($segments[3]) && is_numeric($segments[3])) {
+
+            call_user_func([$controller, $methodName], $segments[3]);
+        }
+        else {
+
+            $this->executeMethodFromController($controller, $methodName);
+        }
     }
 
     private function getControllerFrom($controllerName)
