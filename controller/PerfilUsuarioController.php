@@ -7,26 +7,35 @@ class PerfilUsuarioController
 
     public function __construct($view, $userModel)
     {
-        $this->view = $view;
+        $this->view  = $view;
         $this->model = $userModel;
     }
 
-    public function show()
+    /**
+     * show($id = null):
+     *  - Si $id es null, muestra el perfil del usuario logueado.
+     *  - Si $id tiene un valor, muestra el perfil de ese ID.
+     */
+    public function show($id = null)
     {
+
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
 
         if (!isset($_SESSION['user'])) {
             header("Location: /tp/login");
             exit();
         }
 
-        $id = $_SESSION['user']['id'];
-        $user = $this->model->getUserById($id);
+        if ($id === null) {
+            $id = $_SESSION['user']['id'];
+        }
 
+        $user = $this->model->getUserById($id);
         if (!$user) {
-            die("No se encontró el usuario.");
+            die("Usuario con ID = $id no encontrado.");
         }
 
         $this->view->render("perfilUsuario", $user);
