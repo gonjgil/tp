@@ -33,7 +33,22 @@ class QuizController {
     }
 
     public function answer() {
-        if (!isset($_SESSION['question_start_time']) || !isset($_SESSION['current_question_id'])) {
+        if (
+            !isset($_SESSION['question_start_time']) ||
+            !isset($_SESSION['current_question_id']) ||
+            !isset($_SESSION['signature']) ||
+            !isset($_SESSION['user']['id'])
+        ) {
+            $_SESSION['finish_reason'] = 'cheat';
+            $this->model->endGame($_SESSION['current_game'] ?? null);
+            header("Location: /tp/quiz/finish");
+            exit();
+        }
+
+        $expectedSignature = hash('sha256', $_SESSION['current_question_id'] . '|' . $_SESSION['user']['id'] . '|' . $_SESSION['question_start_time']);
+        if ($_SESSION['signature'] !== $expectedSignature) {
+            $_SESSION['finish_reason'] = 'cheat';
+            $this->model->endGame($_SESSION['current_game'] ?? null);
             header("Location: /tp/quiz/finish");
             exit();
         }
@@ -76,6 +91,7 @@ class QuizController {
 
         unset($_SESSION['question_start_time']);
         unset($_SESSION['current_question_id']);
+        unset($_SESSION['signature']);
 
         if ($correct) {
             header("Location: /tp/quiz/next");
@@ -87,10 +103,11 @@ class QuizController {
     }
 
 
-    private function handleQuestionTimeout(): bool {
+
+    private function handleQuestionTimeout(){
         if (isset($_SESSION['question_start_time'])) {
             $elapsed = time() - $_SESSION['question_start_time'];
-            if ($elapsed > 10) {
+            if ($elapsed > 15) {
                 unset($_SESSION['question_start_time']);
                 unset($_SESSION['current_question_id']);
                 header("Location: /tp/quiz/finish");
@@ -100,7 +117,7 @@ class QuizController {
         return false;
     }
 
-    private function renderCurrentQuestionIfExists(): bool {
+    private function renderCurrentQuestionIfExists(){
         if (isset($_SESSION['current_question_id'])) {
             $questionId = $_SESSION['current_question_id'];
             $q = $this->model->getQuestionById($questionId);
@@ -126,7 +143,7 @@ class QuizController {
         return false;
     }
 
-    private function getNextAvailableQuestion(): ?array {
+    private function getNextAvailableQuestion(){
         $asked = $_SESSION['asked_questions'] ?? [];
         $q = $this->model->getRandomQuestion($asked);
 
@@ -139,12 +156,20 @@ class QuizController {
         return $q;
     }
 
-    private function renderNewQuestion(array $q): void {
+    private function renderNewQuestion(array $q){
         $_SESSION['asked_questions'][] = $q['id'];
+
         $_SESSION['current_question_id'] = $q['id'];
         $_SESSION['question_start_time'] = time();
 
+        $_SESSION['signature'] = hash('sha256',
+            $_SESSION['current_question_id'] . '|' .
+            $_SESSION['user']['id'] . '|' .
+            $_SESSION['question_start_time']
+        );
+
         $this->model->incrementTimesAnsweredQuestions($q['id']);
+
         $opts  = $this->model->getOptionsByQuestion($q['id']);
         $score = $this->model->getScore($_SESSION['current_game']);
         $q['category_class'] = $this->getCategoryClass($q['category_name']);
@@ -159,7 +184,7 @@ class QuizController {
 
 
 
-    private function getCategoryClass(string $categoryName): string {
+    private function getCategoryClass(string $categoryName){
         switch (strtolower($categoryName)) {
             case 'cultura general':
                 return 'w3-red';
@@ -186,7 +211,10 @@ class QuizController {
                 $reasonText = 'Respuesta incorrecta';
                 break;
             case 'timeout':
-                $reasonText = 'Su tiempo se termino';
+                $reasonText = 'Su tiempo se terminó';
+                break;
+            case 'cheat':
+                $reasonText = 'Partida finalizada por trampa';
                 break;
             default:
                 $reasonText = 'Partida finalizada';
@@ -199,6 +227,7 @@ class QuizController {
             'reason' => $reasonText,
         ]);
     }
+
 
 
 }
