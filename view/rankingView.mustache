@@ -1,0 +1,35 @@
+<div class="w3-container" style="margin-top:2rem">
+    <h3 class="w3-text-purple">Ranking de Jugadores</h3>
+    <div class="w3-margin-top">
+        <table class="w3-table-all w3-hoverable w3-striped w3-border w3-centered">
+            <thead class="w3-win8-magenta">
+            <tr>
+                <th class="w3-text-white">Usuario</th>
+                <th class="w3-text-white">Respuestas Correctas</th>
+                <th class="w3-text-white">Preguntas Totales</th>
+                <th class="w3-text-white">Dificultad</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#ranking}}
+                <tr class="w3-hover-light-gray">
+                    <td>
+                        <a href="/tp/perfilUsuario/show/{{id}}"
+                           class="w3-text-pink w3-hover-text-yellow">
+                            {{username}}
+                        </a>
+                    </td>
+                    <td class="w3-text-indigo">{{correct_answers}}</td>
+                    <td class="w3-text-indigo">{{total_answers}}</td>
+                    <td>
+              <span class="w3-tag {{difficulty_class}}">
+                  {{difficulty_label}}
+              </span>
+                    </td>
+                </tr>
+            {{/ranking}}
+            </tbody>
+        </table>
+    </div>
+</div>
+

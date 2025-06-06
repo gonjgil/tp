@@ -1,0 +1,30 @@
+<h2>Perfil de {{username}}</h2>
+
+<div class="w3-card w3-padding w3-margin">
+    <img src="/tp/public/profile_pictures/{{profile_picture}}" alt="Foto de Perfil" style="width:150px; height:150px; object-fit:cover;">
+    <p><strong>Nombre:</strong> {{name}} {{last_name}}</p>
+    <p><strong>Puntaje Final:</strong> {{correct_answers}} respuestas correctas de {{total_answers}}</p>
+    <p><strong>Dificultad Promedio:</strong> {{difficulty}}</p>
+    <p><strong>Ubicación:</strong> {{city}}, {{country}}</p>
+    <p><strong>Partidas Jugadas:</strong> {{games_played}}</p>
+</div>
+
+<div id="map" style="height: 300px;"></div>
+
+<script>
+    function initMap() {
+        const location = { lat: parseFloat({{lat}}), lng: parseFloat({{lng}}) };
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 8,
+            center: location,
+        });
+        new google.maps.Marker({
+            position: location,
+            map: map,
+        });
+    }
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
+</script>
+

@@ -1,0 +1,82 @@
+<div class="w3-container" style="margin-top:70px">
+    <div class="w3-container" style="margin:auto; margin-top:2rem">
+
+
+        <form action="/tp/quiz/answer" method="post">
+
+
+            <div class="w3-panel w3-amber w3-round-large w3-card-4 w3-padding-16">
+                <div class="w3-center w3-small">
+                    <span class="w3-tag {{question.category_class}} w3-round w3-text-white">{{question.category_name}}</span>
+                    <h2 class="w3-center"><b>{{question.question_text}}</b></h2>
+                </div>
+            </div>
+
+            <div class="w3-content" style="margin-top:70px">
+                <div class="w3-row-padding w3-margin-top">
+                    {{#options}}
+                        <div class="w3-padding-large w3-half w3-margin-bottom">
+                            <div class="w3-panel w3-deep-purple w3-round-large w3-card w3-padding-16"
+                                 style="height:100%; min-height:120px; display:flex; align-items:center; justify-content:center">
+                                <label style="width:100%; cursor:pointer">
+                                    <input type="radio" name="answer" value="{{id}}" class="w3-radio" required>
+                                    <span class="w3-large">{{answer_text}}</span>
+                                </label>
+                            </div>
+                        </div>
+                    {{/options}}
+                </div>
+            </div>
+
+            <div class="w3-content">
+                <div class="w3-row-padding w3-margin-top">
+                    <div class="w3-padding-large w3-margin-bottom">
+
+                        <div class="w3-row">
+                            <div class="w3-half">
+                                <span class="w3-large"><strong>Puntos: {{score}}</strong></span>
+                            </div>
+                            <div class="w3-half w3-right-align">
+                                <input type="hidden" name="question_id" value="{{question.id}}">
+                                <button class="w3-button w3-green w3-round-large w3-padding" type="submit">
+                                    <i class="fa fa-paper-plane"></i> Enviar respuesta
+                                </button>
+                            </div>
+                            <div class="w3-half">
+                                <p class="w3-text-red w3-bold w3-large">Tiempo restante: <span id="countdown"></span> segundos</p>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    const countdownEl = document.getElementById("countdown");
+    const TOTAL_SECONDS = 15; // tiempo total para responder
+
+    const serverStartTime = {{question_start_time}} * 1000;
+    const now = Date.now();
+    let elapsed = Math.floor((now - serverStartTime) / 1000);
+    let seconds = TOTAL_SECONDS - elapsed;
+
+    if (seconds < 0) seconds = 0;
+
+    function updateCountdown() {
+        countdownEl.textContent = seconds;
+        if (seconds > 0) {
+            seconds--;
+        }
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+</script>
+
+
+
