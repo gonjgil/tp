@@ -22,31 +22,35 @@ class RankingController
         $rawRows = $this->model->getRanking();
 
         $rankingData = [];
+        $position = 1;
 
         foreach ($rawRows as $row) {
-            $score = (float)$row['difficulty']; // Ej: 0.625
+            $total = (int)$row['total_answers'];
+            $correct = (int)$row['correct_answers'];
+            $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
 
-            if ($score < 0.25) {
-                $label    = 'Fácil';
+            if ($percentage <= 25) {
+                $label = 'Novato';
                 $cssClass = 'w3-win8-green';
-            }
-            elseif ($score < 0.75) {
-                $label    = 'Media';
+            } elseif ($percentage <= 69) {
+                $label = 'Intermedio';
                 $cssClass = 'w3-win8-amber';
-            }
-            else {
-                $label    = 'Difícil';
+            } else {
+                $label = 'Pro';
                 $cssClass = 'w3-win8-crimson';
             }
 
             $rankingData[] = [
+                'position'         => $position++,
                 'id'               => $row['id'],
                 'username'         => $row['username'],
-                'correct_answers'  => $row['correct_answers'],
-                'total_answers'    => $row['total_answers'],
-                'difficulty_raw'   => $row['difficulty'],
-                'difficulty_label' => $label,
-                'difficulty_class' => $cssClass,
+                'profile_picture'  => $row['profile_picture'] ?? 'default.png',
+                'games_played'     => $row['games_played'],
+                'correct_answers'  => $correct,
+                'total_answers'    => $total,
+                'accuracy'         => $percentage,
+                'type_label'       => $label,
+                'type_class'       => $cssClass,
             ];
         }
 
@@ -55,14 +59,18 @@ class RankingController
         ]);
     }
 
-    public function profile($id)
-    {
-        $player = $this->model->getPlayerById($id);
-        if ($player) {
-            $this->view->render("playerProfile", ["player" => $player]);
-        } else {
-            header("Location: /tp/ranking");
-            exit;
-        }
-    }
+//    public function profile($id)
+//    {
+//        $player = $this->model->getPlayerById($id);
+//        if ($player) {
+//            $this->view->render("playerProfile", ["player" => $player]);
+//        } else {
+//            header("Location: /tp/ranking");
+//            exit;
+//        }
+//    }
+
+
+
+
 }

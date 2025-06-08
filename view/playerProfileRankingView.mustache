@@ -1,0 +1,62 @@
+<div class="w3-container w3-padding">
+    <h2 class="w3-text-purple">Perfil de {{player.username}}</h2>
+
+    <div class="w3-card w3-padding w3-margin-bottom w3-center">
+        <img src="/uploads/{{player.profile_picture}}" alt="Foto de perfil" class="w3-circle" style="width:120px;height:120px;">
+        <h3>{{player.name}} {{player.last_name}}</h3>
+        <p><strong>Ciudad:</strong> {{player.city}}, {{player.country}}</p>
+        <p><strong>Respuestas correctas:</strong> {{player.correct_answers}}</p>
+        <p><strong>Total de respuestas:</strong> {{player.total_answers}}</p>
+        <p><strong>Porcentaje de aciertos:</strong> {{player.accuracy}}%</p>
+
+        <!-- Mapa -->
+        <div id="map" style="height: 300px;" class="w3-margin-top w3-border w3-round-large"></div>
+
+        <!-- QR Code -->
+        <div class="w3-margin-top">
+            <p><strong>Escaneá este QR para ver el perfil:</strong></p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://tusitio.com/tp/perfilUsuario/show/{{player.id}}" alt="QR Code">
+        </div>
+    </div>
+
+    <h3 class="w3-text-indigo">Partidas Jugadas</h3>
+    <table class="w3-table-all w3-striped">
+        <thead>
+        <tr>
+            <th>ID Partida</th>
+            <th>Correctas</th>
+            <th>Total Preguntas</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#games}}
+            <tr>
+                <td>{{id_game}}</td>
+                <td>{{correct_answers}}</td>
+                <td>{{total_questions}}</td>
+                <td>{{start_time}}</td>
+                <td>{{end_time}}</td>
+            </tr>
+        {{/games}}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function initMap() {
+        var location = { lat: {{player.lat}}, lng: {{player.lng}} };
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: location
+        });
+        new google.maps.Marker({
+            position: location,
+            map: map
+        });
+    }
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
+</script>

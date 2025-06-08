@@ -1,30 +1,40 @@
+
 <div class="w3-container" style="margin-top:2rem">
     <h3 class="w3-text-purple">Ranking de Jugadores</h3>
     <div class="w3-margin-top">
         <table class="w3-table-all w3-hoverable w3-striped w3-border w3-centered">
             <thead class="w3-win8-magenta">
             <tr>
-                <th class="w3-text-white">Usuario</th>
-                <th class="w3-text-white">Respuestas Correctas</th>
-                <th class="w3-text-white">Preguntas Totales</th>
-                <th class="w3-text-white">Dificultad</th>
+                <th class="w3-text-black">Puesto</th>
+                <th class="w3-text-black">Usuario</th>
+                <th class="w3-text-black">Partidas Jugadas</th>
+                <th class="w3-text-black">Preguntas Correctas</th>
+                <th class="w3-text-black">% Aciertos</th>
+                <th class="w3-text-black">Tipo de Jugador</th>
             </tr>
             </thead>
             <tbody>
             {{#ranking}}
                 <tr class="w3-hover-light-gray">
-                    <td>
-                        <a href="/tp/perfilUsuario/show/{{id}}"
-                           class="w3-text-pink w3-hover-text-yellow">
-                            {{username}}
+                    <td>{{position}}</td>
+
+                    <td style="text-align: center;">
+                        <a href="/tp/playerProfileRanking/show/{{id}}"
+                           class="w3-text-pink w3-hover-text-yellow"
+                           style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <img src="/tp/{{profile_picture}}" alt="Foto"
+                                 style="width: 36px; height: 36px; object-fit: cover; border-radius: 50%;">
+                            <span>{{username}}</span>
                         </a>
                     </td>
-                    <td class="w3-text-indigo">{{correct_answers}}</td>
-                    <td class="w3-text-indigo">{{total_answers}}</td>
+
+                    <td>{{games_played}}</td>
+                    <td>{{correct_answers}}</td>
+                    <td>{{accuracy}}%</td>
                     <td>
-              <span class="w3-tag {{difficulty_class}}">
-                  {{difficulty_label}}
-              </span>
+            <span class="w3-tag {{type_class}}">
+                {{type_label}}
+            </span>
                     </td>
                 </tr>
             {{/ranking}}
@@ -32,4 +42,5 @@
         </table>
     </div>
 </div>
+
 
