@@ -1,17 +1,42 @@
-<h3>Ranking de Jugadores</h3>
-<table class="w3-table w3-bordered w3-striped">
-    <tr>
-        <th>Jugador</th>
-        <th>Respuestas Correctas</th>
-        <th>Respuestas Totales</th>
-        <th>Dificultad</th>
-    </tr>
-    {{#ranking}}
-        <tr>
-            <td><a href="/tp/ranking/profile/{{id}}">{{username}}</a></td>
-            <td>{{correct_answers}}</td>
-            <td>{{total_answers}}</td>
-            <td>{{difficulty}}</td>
-        </tr>
-    {{/ranking}}
-</table>
+
+<div class="w3-container" style="margin-top:2rem">
+    <h3 class="w3-text-purple">Ranking de Jugadores</h3>
+    <div class="w3-margin-top">
+        <table class="w3-table-all w3-hoverable w3-striped w3-border w3-centered">
+            <thead class="w3-win8-magenta">
+            <tr>
+                <th class="w3-text-black">Puesto</th>
+                <th class="w3-text-black">Usuario</th>
+                <th class="w3-text-black">% Aciertos</th>
+                <th class="w3-text-black">Tipo de Jugador</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#ranking}}
+                <tr class="w3-hover-light-gray">
+                    <td>{{position}}</td>
+
+                    <td style="text-align: center;">
+                        <a href="/tp/playerProfileRanking/show/{{id}}"
+                           class="w3-text-pink w3-hover-text-yellow"
+                           style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <img src="/tp/{{profile_picture}}" alt="Foto"
+                                 style="width: 36px; height: 36px; object-fit: cover; border-radius: 50%;">
+                            <span>{{username}}</span>
+                        </a>
+                    </td>
+
+                    <td>{{accuracy}}%</td>
+                    <td>
+            <span class="w3-tag {{type_class}}">
+                {{type_label}}
+            </span>
+                    </td>
+                </tr>
+            {{/ranking}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

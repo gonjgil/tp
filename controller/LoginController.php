@@ -1,5 +1,4 @@
 <?php
-
 class LoginController
 {
     private $view;
@@ -33,7 +32,6 @@ class LoginController
             return;
         }
 
-
         $_SESSION['user'] = [
             'id' => $user['id'],
             'name' => $user['name'],
@@ -47,22 +45,18 @@ class LoginController
         ];
 
         switch ($user['user_type']) {
-            case 'jugador':
+            case 'player':
                 header("Location: /tp/player/panel");
                 exit();
-                break;
             case 'editor':
                 header("Location: /tp/editor/panel");
                 exit();
-                break;
-            case 'administrador':
+            case 'admin':
                 header("Location: /tp/admin/panel");
                 exit();
-                break;
             default:
                 header("Location: /tp/login");
                 exit();
-                break;
         }
     }
 

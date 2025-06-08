@@ -10,7 +10,6 @@ class PlayerController{
         $this->view = $view;
     }
 
-
     public function index()
     {
         $this->panel();
@@ -18,12 +17,10 @@ class PlayerController{
 
     public function panel()
     {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['user_type'] !== 'jugador') {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['user_type'] !== 'player') {
             header("Location: /tp/login");
             exit();
         }
         $this->model->render("player");
     }
-
-
 }

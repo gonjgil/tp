@@ -13,6 +13,7 @@ require_once ("controller/PerfilUsuarioController.php");
 require_once ("controller/QuizController.php");
 require_once ("controller/RecordController.php");
 require_once ("controller/RankingController.php");
+require_once ("controller/PlayerProfileRankingController.php");
 
 require_once("model/LoginModel.php");
 require_once("model/RegisterModel.php");
@@ -22,7 +23,8 @@ require_once("model/PlayerModel.php");
 require_once("model/PerfilUsuarioModel.php");
 require_once("model/QuizModel.php");
 require_once("model/RecordModel.php");
-require_once ("model/RankingModel.php");
+require_once("model/RankingModel.php");
+require_once("model/PlayerProfileRankingModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -49,7 +51,6 @@ class Configuration
     }
     
     public function getViewer(){
-        //return new FileView();
         return new MustachePresenter("view");
     }
     
@@ -121,6 +122,7 @@ class Configuration
         return new RankingController($model, $view);
     }
 
+
     public function getCrearPreguntaController() {
         require_once("controller/CrearPreguntaController.php");
         require_once("model/CrearPreguntaModel.php");
@@ -128,6 +130,14 @@ class Configuration
         $model = new CrearPreguntaModel($this->getDatabase());
         $view = $this->getViewer();
         return new CrearPreguntaController($model, $view);
+    }
+
+
+
+    public function getPlayerProfileRankingController() {
+        $model = new PlayerProfileRankingModel($this->getDatabase());
+        $view = $this->getViewer();
+        return new PlayerProfileRankingController($model, $view);
     }
 
 

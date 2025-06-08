@@ -1,8 +1,10 @@
 <?php
 
+
 class RankingController
 {
     private $model, $view;
+
     public function __construct($model, $view)
     {
         $this->model = $model;
@@ -11,28 +13,54 @@ class RankingController
 
     public function index()
     {
+
         $this->showRanking();
     }
 
-
     public function showRanking()
     {
-        $ranking = $this->model->getRanking();
-        $this->view->render("ranking", ["ranking" => $ranking]);
-    }
+        $rawRows = $this->model->getRanking();
 
-    public function showProfile($id)
-    {
-        $player = $this->model->getPlayerById($id);
-        if ($player) {
-            $this->view->render("playerProfile", ["player" => $player]);
-        } else {
-            $this->redirect("/tp/ranking");
+        $rankingData = [];
+        $position = 1;
+
+        foreach ($rawRows as $row) {
+            $total = (int)$row['total_answers'];
+            $correct = (int)$row['correct_answers'];
+            $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
+
+            switch (true) {
+                case ($percentage <= 25):
+                    $label = 'Novato';
+                    $cssClass = 'w3-win8-green';
+                    break;
+                case ($percentage <= 69):
+                    $label = 'Intermedio';
+                    $cssClass = 'w3-win8-amber';
+                    break;
+                default:
+                    $label = 'Pro';
+                    $cssClass = 'w3-win8-crimson';
+                    break;
+            }
+
+            $rankingData[] = [
+                'position'         => $position++,
+                'id'               => $row['id'],
+                'username'         => $row['username'],
+                'profile_picture'  => $row['profile_picture'] ?? 'default.png',
+                'games_played'     => $row['games_played'],
+                'correct_answers'  => $correct,
+                'total_answers'    => $total,
+                'accuracy'         => $percentage,
+                'type_label'       => $label,
+                'type_class'       => $cssClass,
+            ];
         }
+
+        $this->view->render('ranking', [
+            'ranking' => $rankingData
+        ]);
     }
 
-    public function profile($id)
-    {
-        $this->showProfile($id);
-    }
 }

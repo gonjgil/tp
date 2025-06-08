@@ -35,8 +35,6 @@ class QuizModel {
         return $question;
     }
 
-
-//-
     private function getQuestionsAlreadyAnsweredByUser(int $userId){
         $sql = "SELECT DISTINCT q.question_id
             FROM game_questions q
@@ -49,7 +47,6 @@ class QuizModel {
         return array_column($result, 'question_id');
     }
 
-//-
     public function clearUserQuestionHistory(int $userId) {
         $sql = "DELETE q FROM game_questions q
             JOIN games g ON q.id_game = g.id_game
@@ -59,7 +56,6 @@ class QuizModel {
         $stmt->execute();
     }
 
-//-
     public function saveQuestionToGame(int $gameId, int $questionId) {
         $sql = "INSERT IGNORE INTO game_questions (id_game, question_id) VALUES (?, ?)";
         $stmt = $this->db->prepare($sql);
@@ -201,6 +197,15 @@ class QuizModel {
         $stmt->bind_param("i", $gameId);
         $stmt->execute();
     }
+
+    public function getQuestionById(int $id) {
+        $sql = "SELECT q.*, c.name AS category_name FROM questions q JOIN categories c ON q.category_id = c.id WHERE q.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
 
 
 

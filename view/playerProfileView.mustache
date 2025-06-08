@@ -11,20 +11,45 @@
 
 <div id="map" style="height: 300px;"></div>
 
+
+
+
+
+<!-- mapa CSS -->
+<link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-sA+4NR0T0G58lM2HrKeR8D9ALaS9CTCO9TIiC2LrE3A="
+        crossorigin=""
+/>
+
+<!-- mapa JS -->
+<script
+        src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-DzZ4eWkONh5C3URro12CtEeX5e7QTh8ZepcRZx4pmiw="
+        crossorigin=""
+></script>
+
 <script>
-    function initMap() {
-        const location = { lat: parseFloat({{lat}}), lng: parseFloat({{lng}}) };
-        const map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 8,
-            center: location,
-        });
-        new google.maps.Marker({
-            position: location,
-            map: map,
-        });
-    }
+    document.addEventListener("DOMContentLoaded", function() {
+        const lat = parseFloat({{lat}});
+        const lng = parseFloat({{lng}});
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+            const map = L.map('map').setView([lat, lng], 8);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                maxZoom: 18,
+            }).addTo(map);
+
+            L.marker([lat, lng]).addTo(map)
+                    .bindPopup('{{username}}')
+                    .openPopup();
+        } else {
+            document.getElementById('map').innerHTML = '<p>No hay datos de ubicación disponibles.</p>';
+        }
+    });
 </script>
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
-</script>
+
 

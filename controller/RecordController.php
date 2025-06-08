@@ -13,7 +13,6 @@ class RecordController
 
     public function index()
     {
-        var_dump($_SESSION['user']);
         $userId = $_SESSION['user']['id'];
         $username = $_SESSION['user']['username'];
         $games = $this->model->getUserGames($userId);
