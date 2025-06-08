@@ -19,7 +19,7 @@ class PlayerProfileRankingController {
 
         $games = $this->model->getGamesByUser($id);
 
-        // Calcular el porcentaje de aciertos
+        // porcentaje
         $totalAnswers = $player->total_answers ?? 0;
         $correctAnswers = $player->correct_answers ?? 0;
         $accuracy = ($totalAnswers > 0) ? round(($correctAnswers / $totalAnswers) * 100, 2) : 0;

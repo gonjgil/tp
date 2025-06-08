@@ -29,15 +29,19 @@ class RankingController
             $correct = (int)$row['correct_answers'];
             $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
 
-            if ($percentage <= 25) {
-                $label = 'Novato';
-                $cssClass = 'w3-win8-green';
-            } elseif ($percentage <= 69) {
-                $label = 'Intermedio';
-                $cssClass = 'w3-win8-amber';
-            } else {
-                $label = 'Pro';
-                $cssClass = 'w3-win8-crimson';
+            switch (true) {
+                case ($percentage <= 25):
+                    $label = 'Novato';
+                    $cssClass = 'w3-win8-green';
+                    break;
+                case ($percentage <= 69):
+                    $label = 'Intermedio';
+                    $cssClass = 'w3-win8-amber';
+                    break;
+                default:
+                    $label = 'Pro';
+                    $cssClass = 'w3-win8-crimson';
+                    break;
             }
 
             $rankingData[] = [
@@ -58,19 +62,5 @@ class RankingController
             'ranking' => $rankingData
         ]);
     }
-
-//    public function profile($id)
-//    {
-//        $player = $this->model->getPlayerById($id);
-//        if ($player) {
-//            $this->view->render("playerProfile", ["player" => $player]);
-//        } else {
-//            header("Location: /tp/ranking");
-//            exit;
-//        }
-//    }
-
-
-
 
 }
