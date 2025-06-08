@@ -15,6 +15,8 @@ require_once ("controller/RecordController.php");
 require_once ("controller/RankingController.php");
 require_once ("controller/PlayerProfileRankingController.php");
 
+require_once ("controller/CrearPreguntaController.php");
+
 require_once("model/LoginModel.php");
 require_once("model/RegisterModel.php");
 require_once("model/AdminModel.php");
@@ -25,6 +27,8 @@ require_once("model/QuizModel.php");
 require_once("model/RecordModel.php");
 require_once("model/RankingModel.php");
 require_once("model/PlayerProfileRankingModel.php");
+
+require_once ("model/CrearPreguntaModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -126,6 +130,12 @@ class Configuration
         $model = new PlayerProfileRankingModel($this->getDatabase());
         $view = $this->getViewer();
         return new PlayerProfileRankingController($model, $view);
+    }
+
+    public function getCrearPreguntaController(){
+        $model = new CrearPreguntaModel($this->getDatabase());
+        $view = $this->getViewer();
+        return new CrearPreguntaController($model, $view);
     }
 
 }
