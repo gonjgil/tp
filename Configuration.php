@@ -122,6 +122,7 @@ class Configuration
     }
 
     public function getCrearPreguntaController() {
+        echo "Controlador CrearPregunta cargada";
         require_once("controller/CrearPreguntaController.php");
         require_once("model/CrearPreguntaModel.php");
 
@@ -129,6 +130,5 @@ class Configuration
         $view = $this->getViewer();
         return new CrearPreguntaController($model, $view);
     }
-
 
 }

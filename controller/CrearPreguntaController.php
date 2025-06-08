@@ -1,7 +1,5 @@
 <?php
 
-require_once 'model/CrearPreguntaModel.php';
-
 class CrearPreguntaController {
     private $model;
     private $view;
@@ -10,26 +8,28 @@ class CrearPreguntaController {
         $this->model = $model;
         $this->view = $view;
     }
-
-    // Este se llama con method=index
     public function index() {
-        echo $this->view->render("crearPreguntaView");
+        echo $this->view->render("crearPregunta", ["mensaje" => "Hola, esto es una prueba de vista."]);
     }
-
-    // Este se llama con method=guardar
     public function guardar() {
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $pregunta = $_POST['pregunta'];
-            $opcionA = $_POST['opcion_a'];
-            $opcionB = $_POST['opcion_b'];
-            $opcionC = $_POST['opcion_c'];
-            $opcionD = $_POST['opcion_d'];
+            $opciones = $_POST['opciones'];
             $respuestaCorrecta = $_POST['respuesta_correcta'];
-            $categoria = $_POST['categoria'];
+            $categoriaId = $_POST['categoria_id'];
 
-            $this->model->guardarPregunta($pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $categoria);
+            $creatorId = $_SESSION['user']['id'] ?? null;
 
-            echo "<p>Pregunta guardada correctamente.</p><a href='index.php?controller=crearPregunta&method=index'>Crear otra</a>";
+            if (!$creatorId) {
+                echo "No se pudo otener el ID del usuario actual";
+                return;
+            }
+
+            $this->model->guardarPregunta($pregunta, $opciones, $respuestaCorrecta, $categoriaId, $creatorId);
+
+            echo "<p>Pregunta guardada correctamente.</p><a href='/tp/index.php?controller=crearPregunta&method=index'>Crear otra</a>";
+
         }
     }
+
 }
