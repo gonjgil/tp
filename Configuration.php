@@ -124,6 +124,7 @@ class Configuration
 
 
     public function getCrearPreguntaController() {
+        echo "Controlador CrearPregunta cargada";
         require_once("controller/CrearPreguntaController.php");
         require_once("model/CrearPreguntaModel.php");
 
@@ -134,11 +135,13 @@ class Configuration
 
 
 
+
     public function getPlayerProfileRankingController() {
         $model = new PlayerProfileRankingModel($this->getDatabase());
         $view = $this->getViewer();
         return new PlayerProfileRankingController($model, $view);
     }
+
 
 
 }

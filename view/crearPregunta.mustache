@@ -1,19 +1,20 @@
 <h2>Crear nueva pregunta</h2>
-<form method="post" action="index.php?controller=crearPregunta&method=guardar">
+<form method="post" action="/tp/index.php?controller=crearPregunta&method=guardar">
+
     <label>Pregunta:</label><br>
     <input type="text" name="pregunta" required><br><br>
 
     <label>Opción A:</label><br>
-    <input type="text" name="opcion_a" required><br><br>
+    <input type="text" name="opciones[A]" required><br><br>
 
     <label>Opción B:</label><br>
-    <input type="text" name="opcion_b" required><br><br>
+    <input type="text" name="opciones[B]" required><br><br>
 
     <label>Opción C:</label><br>
-    <input type="text" name="opcion_c" required><br><br>
+    <input type="text" name="opciones[C]" required><br><br>
 
     <label>Opción D:</label><br>
-    <input type="text" name="opcion_d" required><br><br>
+    <input type="text" name="opciones[D]" required><br><br>
 
     <label>Respuesta correcta:</label><br>
     <select name="respuesta_correcta" required>
@@ -23,8 +24,9 @@
         <option value="D">D</option>
     </select><br><br>
 
-    <label>Categoría:</label><br>
-    <input type="text" name="categoria" required><br><br>
+    <label>Categoría (ID):</label><br>
+    <input type="number" name="categoria_id" required><br><br>
 
     <button type="submit">Guardar pregunta</button>
 </form>
+
