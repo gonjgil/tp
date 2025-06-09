@@ -28,7 +28,12 @@
     </select><br><br>
 
     <label for="categoria_id">Categoría (ID):</label><br>
-    <input type="number" name="categoria_id" id="categoria_id" required><br><br>
+    <select name="categoria_id" id="categoria_id" required>
+    {{#categories}}
+    <option value="{{id}}">{{name}}</option>
+    {{/categories}}
+    </select>
+    <br><br>
 
     <button type="submit">Guardar pregunta</button>
 </form>

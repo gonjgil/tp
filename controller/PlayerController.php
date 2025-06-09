@@ -17,10 +17,6 @@ class PlayerController{
 
     public function panel()
     {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['user_type'] !== 'player') {
-            header("Location: /tp/login");
-            exit();
-        }
         $this->model->render("player");
     }
 }

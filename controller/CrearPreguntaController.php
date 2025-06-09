@@ -10,7 +10,10 @@ class CrearPreguntaController {
     }
 
     public function index() {
-        echo $this->view->render("crearPregunta", ["mensaje" => "Hola, esto es una prueba de vista."]);
+        $categories = $this->model->getCategories();
+        $data = ['categories' => $categories];
+        
+        echo $this->view->render("crearPregunta", $data);
     }
 
 
@@ -19,8 +22,7 @@ class CrearPreguntaController {
             $pregunta = $_POST['pregunta'];
             $opciones = $_POST['opciones'];
             $respuestaCorrecta = $_POST['respuesta_correcta'];
-            $categoriaId = $_POST['categoria_id'];
-
+            $categoriaId = $_POST['categories'][name];
             $creatorId = $_SESSION['user']['id'] ?? null;
 
             if (!$creatorId) {

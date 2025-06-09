@@ -8,7 +8,6 @@ class CrearPreguntaModel {
     }
 
     public function guardarPregunta($pregunta, $opciones, $respuestaCorrecta, $categoriaId, $creatorId) {
-
         $query = $this->db->prepare("INSERT INTO questions (question_text, category_id, creator_id, approved, reported, difficulty, times_answered, times_incorrect)
                                  VALUES (?, ?, ?, 0, 0, 100, 0, 0)");
         $query->execute([$pregunta, $categoriaId, $creatorId]);
@@ -23,4 +22,15 @@ class CrearPreguntaModel {
         }
     }
 
+    public function getCategories() {
+        $data = [];
+        $query = $this->db->prepare("SELECT id, name FROM categories ORDER BY name ASC");
+        $query->execute();
+        $result = $query->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        $query->close();
+        return $data;
+    }
 }
