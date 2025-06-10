@@ -2,11 +2,11 @@
   "public": {
     "login": [],
     "home": [],
-    "register": [],
-    "perfilusuario": []
+    "register": []
   },
   "player": {
     "player": [],
+    "perfilusuario": [],
     "quiz": [],
     "ranking": [],
     "record": [],
@@ -14,9 +14,11 @@
     "crearpregunta": []
   },
   "editor": {
-    "editor": []
+    "editor": [],
+    "perfilusuario": []
   },
   "admin": {
-    "admin": []
+    "admin": [],
+    "perfilusuario": []
   }
 }
