@@ -19,16 +19,16 @@ class MustachePresenter{
 
             switch ($_SESSION['user']['user_type']) {
                 case 'player':
-                    $data['panelUrl'] = '/tp/player/panel';
+                    $data['panelUrl'] = '/player/panel';
                     break;
                 case 'editor':
-                    $data['panelUrl'] = '/tp/editor/panel';
+                    $data['panelUrl'] = '/editor/panel';
                     break;
                 case 'admin':
-                    $data['panelUrl'] = '/tp/admin/panel';
+                    $data['panelUrl'] = '/admin/panel';
                     break;
                 default:
-                    $data['panelUrl'] = '/tp/home/index';
+                    $data['panelUrl'] = '/home/index';
                     break;
             }
         }

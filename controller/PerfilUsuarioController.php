@@ -11,11 +11,6 @@ class PerfilUsuarioController
         $this->model = $userModel;
     }
 
-    /**
-     * show($id = null):
-     *  - Si $id es null, muestra el perfil del usuario logueado.
-     *  - Si $id tiene un valor, muestra el perfil de ese ID.
-     */
     public function show($id = null)
     {
 
@@ -25,7 +20,7 @@ class PerfilUsuarioController
 
 
         if (!isset($_SESSION['user'])) {
-            header("Location: /tp/login");
+            header("Location: /login");
             exit();
         }
 

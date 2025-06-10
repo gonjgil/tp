@@ -47,7 +47,7 @@ class RegisterController
                 $lng
             );
 
-            header("Location: /tp/login");
+            header("Location: /login");
             exit();
         } else {
             $this->view->render("register", ['errors' => $errors]);

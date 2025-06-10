@@ -2,7 +2,7 @@
     <h2 class="w3-text-purple">Perfil de {{player.username}}</h2>
 
     <div class="w3-card w3-padding w3-margin-bottom w3-center">
-        <img src="/tp/{{player.profile_picture}}" alt="Foto de perfil" class="w3-circle"
+        <img src="/{{player.profile_picture}}" alt="Foto de perfil" class="w3-circle"
              style="width:120px; height:120px; object-fit: cover; margin-top: 16px;">
         <h3>{{player.name}} {{player.last_name}}</h3>
         <p><strong>Ciudad:</strong> {{player.city}}, {{player.country}}</p>
@@ -15,14 +15,14 @@
         <!-- qr -->
         <div class="w3-margin-top">
             <p><strong>Escaneá este QR para ver el perfil:</strong></p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://localhost/tp/perfilUsuario/show/{{player.id}}"
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://localhost/perfilUsuario/show/{{player.id}}"
                  alt="QR Code">
-            <p class="w3-large">O <a href="/tp/perfilUsuario/show/{{player.id}}" class="w3-text-blue">tocá este link para ir al perfil</a></p>
+            <p class="w3-large">O <a href="/perfilUsuario/show/{{player.id}}" class="w3-text-blue">tocá este link para ir al perfil</a></p>
         </div>
     </div>
 
     <div class="w3-margin-top w3-right">
-        <a href="/tp/ranking" class="w3-button w3-purple w3-hover-deep-purple w3-round-large">
+        <a href="/ranking" class="w3-button w3-purple w3-hover-deep-purple w3-round-large">
             Volver al Ranking
         </a>
     </div>
@@ -47,8 +47,8 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const lat = parseFloat({{player.lat}});
-        const lng = parseFloat({{player.lng}});
+        const lat = parseFloat('{{player.lat}}');
+        const lng = parseFloat('{{player.lng}}');
 
         if (!isNaN(lat) && !isNaN(lng)) {
             const map = L.map('map').setView([lat, lng], 13);

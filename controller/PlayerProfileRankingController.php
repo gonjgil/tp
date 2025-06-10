@@ -13,8 +13,8 @@ class PlayerProfileRankingController {
         $player = $this->model->getPlayerData($id);
 
         if (!$player) {
-            header("Location: /tp/ranking");
-            exit;
+            header("Location: /ranking");
+            exit();
         }
 
         $games = $this->model->getGamesByUser($id);

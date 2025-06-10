@@ -32,7 +32,7 @@ class CrearPreguntaController {
 
             $this->model->guardarPregunta($pregunta, $opciones, $respuestaCorrecta, $categoriaId, $creatorId);
 
-            echo "<p>Pregunta guardada correctamente.</p><a href='/tp/index.php?controller=crearPregunta&method=index'>Crear otra</a>";
+            echo "<p>Pregunta guardada correctamente.</p><a href='/index.php?controller=crearPregunta&method=index'>Crear otra</a>";
 
         }
     }

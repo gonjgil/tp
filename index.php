@@ -45,7 +45,7 @@ function checkAccess($controller, $method, $rolsConfig) {
 }
 
 if (!checkAccess($controller, $method, $rolsConfig)) {
-    header("Location: /tp/login");
+    header("Location: /login");
     exit();
 }
 

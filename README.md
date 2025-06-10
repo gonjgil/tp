@@ -1,5 +1,9 @@
 # tp-preguntas
 
+# revisar
+cuando se pierde la partida solo se ve una pagina en blanco
+
+# cambios
 31/05
 Reparada la vista Registro (cuando se agrego el mapa, el footer quedaba en medio y no se veian campos y botonoes, ademas de quedar etatica)
 Eliminados archivos y funciones innecesarias.
@@ -26,6 +30,10 @@ Ahora hay 3 sql para cargar en orden: database -> usuarios -> preguntas
 
 /***************************************/
 
-9/0
+9/06
 Eliminado codigo innecesario en los controladores, para verificacion de roles (ya se manejaba desde el index)
 Crear pregunta ahora muestra una lista con los nombres de las categorias, no el id
+
+/***************************************/
+10/06
+Movido todo a raiz

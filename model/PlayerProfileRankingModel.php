@@ -20,7 +20,8 @@ class PlayerProfileRankingModel {
         $query = "SELECT id_game, correct_answers, total_questions, start_time, end_time 
               FROM games WHERE user_id = ? ORDER BY start_time DESC";
         $stmt = $this->db->prepare($query);
-        $stmt->execute([$id]);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
 
         $result = [];
         $res = $stmt->get_result();

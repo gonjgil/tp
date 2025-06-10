@@ -11,7 +11,7 @@ class QuizController {
         $_SESSION['current_game'] = $gameId;
         $_SESSION['asked_questions'] = [];
         unset($_SESSION['question_start_time']);
-        header("Location: /tp/quiz/next");
+        header("Location: /quiz/next");
         exit();
     }
 
@@ -41,7 +41,7 @@ class QuizController {
         ) {
             $_SESSION['finish_reason'] = 'cheat';
             $this->model->endGame($_SESSION['current_game'] ?? null);
-            header("Location: /tp/quiz/finish");
+            header("Location: /quiz/finish");
             exit();
         }
 
@@ -49,7 +49,7 @@ class QuizController {
         if ($_SESSION['signature'] !== $expectedSignature) {
             $_SESSION['finish_reason'] = 'cheat';
             $this->model->endGame($_SESSION['current_game'] ?? null);
-            header("Location: /tp/quiz/finish");
+            header("Location: /quiz/finish");
             exit();
         }
 
@@ -60,7 +60,7 @@ class QuizController {
 
             $_SESSION['finish_reason'] = 'timeout';
 
-            header("Location: /tp/quiz/finish");
+            header("Location: /quiz/finish");
             exit();
         }
 
@@ -94,10 +94,10 @@ class QuizController {
         unset($_SESSION['signature']);
 
         if ($correct) {
-            header("Location: /tp/quiz/next");
+            header("Location: /quiz/next");
         } else {
             $this->model->endGame($gameId);
-            header("Location: /tp/quiz/finish");
+            header("Location: /quiz/finish");
         }
         exit();
     }
@@ -110,7 +110,7 @@ class QuizController {
             if ($elapsed > 15) {
                 unset($_SESSION['question_start_time']);
                 unset($_SESSION['current_question_id']);
-                header("Location: /tp/quiz/finish");
+                header("Location: /quiz/finish");
                 exit();
             }
         }

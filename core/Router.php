@@ -21,11 +21,6 @@ class Router
 
         $uri      = trim($_SERVER['REQUEST_URI'], '/');
         $segments = explode('/', $uri);
-        //     segments[0] = "tp"
-        //     segments[1] = "perfilUsuario"
-        //     segments[2] = "show"
-        //     segments[3] = "4"
-
 
         if (isset($segments[3]) && is_numeric($segments[3])) {
 
@@ -44,9 +39,21 @@ class Router
         return call_user_func(array($this->configuration, $validController));
     }
 
+    // metodo previo
+    // private function executeMethodFromController($controller, $method)
+    // {
+    //     $validMethod = method_exists($controller, $method) ? $method : $this->defaultMethod;
+    //     call_user_func(array($controller, $validMethod));
+    // }
+
     private function executeMethodFromController($controller, $method)
-    {
-        $validMethod = method_exists($controller, $method) ? $method : $this->defaultMethod;
-        call_user_func(array($controller, $validMethod));
-    }
+{
+    $validMethod = method_exists($controller, $method) ? $method : $this->defaultMethod;
+
+    $params = array_filter($_GET, function($key) {
+        return $key !== 'controller' && $key !== 'method';
+    }, ARRAY_FILTER_USE_KEY);
+
+    call_user_func_array([$controller, $validMethod], array_values($params));
+}
 }

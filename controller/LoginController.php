@@ -46,16 +46,16 @@ class LoginController
 
         switch ($user['user_type']) {
             case 'player':
-                header("Location: /tp/player/panel");
+                header("Location: /player/panel");
                 exit();
             case 'editor':
-                header("Location: /tp/editor/panel");
+                header("Location: /editor/panel");
                 exit();
             case 'admin':
-                header("Location: /tp/admin/panel");
+                header("Location: /admin/panel");
                 exit();
             default:
-                header("Location: /tp/login");
+                header("Location: /login");
                 exit();
         }
     }
@@ -63,7 +63,7 @@ class LoginController
     public function logout()
     {
         session_destroy();
-        header("Location: /tp");
+        header("Location: /");
         exit();
     }
 }
