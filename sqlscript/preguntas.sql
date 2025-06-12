@@ -3,10 +3,10 @@ USE trivia;
 /* PREGUNTAS (datos) */
 INSERT INTO questions (id, question_text, category_id, creator_id, approved, reported, difficulty, times_answered, times_incorrect) VALUES
     (1, 'Cual es la capital de Francia?', 1, 2, 1, 0, 90, 10, 9),
-    (2, 'Que planeta es conocido como planeta rojo?', 2, 2, 1, 0, 30, 10, 3),
+    (2, 'Que planeta es conocido como planeta rojo?', 2, 2, 1, 1, 30, 10, 3),
     (3, 'Quien escribio "Romeo y Julieta"?', 1, 3, 1, 0, 60, 10, 6),
     (4, 'Cual es es simbolo quimico del agua?', 2, 3, 1, 0, 90, 10, 9),
-    (5, 'En que año piso la luna el primer ser humano?', 3, 2, 1, 0, 60, 10, 6),
+    (5, 'En que año piso la luna el primer ser humano?', 3, 2, 1, 1, 60, 10, 6),
     (6, 'Cuál es el idioma más hablado del mundo?', 1, 2, 1, 0, 60, 10, 6),
     (7, 'Quién pintó la Mona Lisa?', 1, 2, 1, 0, 30, 10, 3),
     (8, 'Qué órgano del cuerpo humano bombea sangre?', 2, 2, 1, 0, 30, 10, 3),

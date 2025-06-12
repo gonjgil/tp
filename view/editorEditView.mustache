@@ -1,0 +1,50 @@
+<div class="w3-container w3-margin-top">
+  <h2>Editar Pregunta #{{question.id}}</h2>
+
+  <!-- Eliminar -->
+  <a
+    href="/editor/delete/{{question.id}}"
+    onclick="return confirm('¿Eliminar pregunta #{{question.id}}?');"
+    class="w3-button w3-small w3-deep-orange"
+  >
+    Eliminar
+  </a>
+
+  <form method="post" action="/editor/editSubmit">
+    <input type="hidden" name="question_id" value="{{question.id}}">
+
+    <div class="w3-margin-bottom">
+      <label class="w3-text-blue"><strong>Texto de la Pregunta</strong></label>
+      <textarea
+        name="question_text"
+        class="w3-input w3-border"
+        rows="3"
+        required
+      >{{question.question_text}}</textarea>
+    </div>
+
+    <h3>Respuestas</h3>
+    {{#answers}}
+    <div class="w3-margin-bottom">
+      <input type="hidden"
+             name="answers[{{@index}}][id]"
+             value="{{id}}">
+      <label class="w3-text-blue"><strong>Respuesta {{@indexPlus1}}</strong></label>
+      <input type="text"
+             name="answers[{{@index}}][text]"
+             class="w3-input w3-border"
+             value="{{answer_text}}"
+             required>
+      <label class="w3-margin-left">
+        <input type="radio"
+               name="answers[{{@index}}][is_correct]"
+               {{#is_correct}}checked{{/is_correct}}>
+        Correcta
+      </label>
+    </div>
+    {{/answers}}
+
+    <button type="submit" class="w3-button w3-green">Guardar Cambios</button>
+    <a href="/editor/all" class="w3-button w3-red">Cancelar</a>
+  </form>
+</div>

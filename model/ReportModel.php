@@ -23,12 +23,34 @@ class ReportModel {
         return array_column($result, 'question_id');
     }
 
-    public function saveReport($questionId, $reportText) {
-        $stmt = $this->db->prepare("INSERT INTO reports (id_question, report) VALUES (?, ?)");
-        $stmt->bind_param("is", $questionId, $reportText);
+    public function createReport(int $questionId, int $userId, string $reportText): bool {
+        $sql  = "INSERT INTO reports (id_question, report, reported_by) VALUES (?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("isi", $questionId, $reportText, $userId);
         return $stmt->execute();
     }
-    
+
+    public function getReportDetails(int $questionId) {
+        $sql = "
+      SELECT r.id AS report_id,
+             r.id_question,
+             r.report,
+             r.reported_at,
+             r.reported_by,
+             u.username
+        FROM reports r
+        JOIN users  u ON u.id = r.reported_by
+       WHERE r.id_question = ?
+       ORDER BY r.reported_at DESC
+       LIMIT 1
+    ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $questionId);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+        return $res ?: null;
+    }
+
     public function markQuestionReported($questionId) {
         $stmt = $this->db->prepare("UPDATE questions SET reported = 1 WHERE id = ?");
         $stmt->bind_param("i", $questionId);

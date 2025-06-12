@@ -1,0 +1,43 @@
+<div class="w3-container w3-margin-top">
+  <h2>Listado de Preguntas ({{mode}})</h2>
+  <table class="w3-table-all w3-hoverable w3-centered">
+    <thead>
+      <tr class="w3-win8-blue">
+        <th>ID</th>
+        <th>Pregunta</th>
+        <th>Aprobada</th>
+        <th>Reportada</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#questions}}
+      <tr>
+        <td>{{id}}</td>
+        <td>{{question_text}}</td>
+        <td>{{#approved}}Sí{{/approved}}{{^approved}}No{{/approved}}</td>
+        <td>{{#reported}}Sí{{/reported}}{{^reported}}No{{/reported}}</td>
+        <td>
+          <!-- Toggle approved -->
+          <form action="/editor/toggle/{{id}}" method="post" style="display:inline">
+            <button class="w3-button w3-small {{#approved}}w3-red{{/approved}}{{^approved}}w3-green{{/approved}}">
+              {{#approved}}Desactivar{{/approved}}{{^approved}}Activar{{/approved}}
+            </button>
+          </form>
+          <!-- Editar -->
+          <a href="/editor/edit/{{id}}" class="w3-button w3-small w3-blue">Editar</a>
+          <!-- Eliminar -->
+          <form action="/editor/delete/{{id}}" method="post" style="display:inline" onsubmit="return confirm('¿Eliminar pregunta #{{id}}?');">
+            <button class="w3-button w3-small w3-deep-orange">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {{/questions}}
+      {{^questions}}
+      <tr>
+        <td colspan="5">No hay preguntas para mostrar.</td>
+      </tr>
+      {{/questions}}
+    </tbody>
+  </table>
+</div>

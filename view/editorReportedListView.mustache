@@ -1,0 +1,122 @@
+<div class="w3-container w3-margin-top">
+  <h2>Preguntas Reportadas</h2>
+  <table class="w3-table-all w3-hoverable w3-centered">
+    <thead>
+      <tr class="w3-win8-blue">
+        <th>ID</th>
+        <th>Pregunta</th>
+        <th>Reportado Por</th>
+        <th>Fecha</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{#reports}}
+      <tr>
+        <td>{{question_id}}</td>
+        <td>{{question_text}}</td>
+        <td>{{username}}</td>
+        <td>{{reported_at}}</td>
+        <td>
+          <button
+            class="w3-button w3-small w3-indigo"
+            onclick="document.getElementById('modal-{{question_id}}').style.display='block'">
+            Ver Reporte
+          </button>
+          <form action="/editor/deleteReport/{{report_id}}"
+                method="post"
+                style="display:inline"
+                onsubmit="return confirm('¿Borrar reporte #{{report_id}} para pregunta #{{question_id}}?');">
+            <button class="w3-button w3-small w3-deep-orange">
+              Borrar Reporte
+            </button>
+          </form>
+        </td>
+      </tr>
+
+      <!-- Aquí va el modal -->
+      <div id="modal-{{question_id}}" class="w3-modal">
+        <div class="w3-modal-content w3-animate-top w3-card-4">
+          <header class="w3-container w3-win8-blue">
+            <span
+              onclick="document.getElementById('modal-{{question_id}}').style.display='none'"
+              class="w3-button w3-display-topright">&times;</span>
+            <h3>Reporte de Pregunta #{{question_id}}</h3>
+          </header>
+
+          <div class="w3-container">
+            <p><strong>Pregunta:</strong> {{question_text}}</p>
+            <p><strong>Reportado por:</strong> {{username}} (ID: {{reported_by}})</p>
+            <p><strong>Fecha:</strong> {{reported_at}}</p>
+            <p><strong>Motivo:</strong> {{report}}</p>
+          </div>
+
+          <footer class="w3-container w3-padding">
+            <div class="w3-bar w3-right">
+
+
+              <form action="/editor/toggle/{{question_id}}" method="post" style="display:inline">
+                <button
+                  class="w3-button w3-small {{#approved}}w3-green{{/approved}}{{^approved}}w3-red{{/approved}}"
+                  onclick="return confirm('¿Cambiar estado aprobado para #{{question_id}}?');">
+                  {{#approved}}Activar{{/approved}}{{^approved}}Desactivar{{/approved}}
+                </button>
+              </form>
+
+
+              <a
+                href="/editor/edit/{{question_id}}"
+                class="w3-button w3-small w3-blue">
+                Editar
+              </a>
+
+
+              <form action="/editor/delete/{{question_id}}" method="post" style="display:inline">
+                <button
+                  class="w3-button w3-small w3-deep-orange"
+                  onclick="return confirm('¿Eliminar pregunta #{{question_id}}?');">
+                  Eliminar
+                </button>
+              </form>
+
+
+              <button
+                onclick="document.getElementById('modal-{{question_id}}').style.display='none'"
+                class="w3-button w3-small w3-light-grey">
+                Cerrar
+              </button>
+
+            </div>
+          </footer>
+        </div>
+      </div>
+    {{/reports}}
+    {{^reports}}
+      <tr><td colspan="5">No hay reportes.</td></tr>
+    {{/reports}}
+    </tbody>
+  </table>
+</div>
+
+
+<script>
+
+function openReportModal(reportId) {
+
+  const btn = document.querySelector(
+    `[onclick="openReportModal(${reportId})"]`
+  );
+  document.getElementById('modalQuestionId').innerText   = btn.dataset.qid;
+  document.getElementById('modalQuestionText').innerText = btn.dataset.qtext;
+  document.getElementById('modalUserId').innerText       = btn.dataset.uid;
+  document.getElementById('modalUsername').innerText     = btn.dataset.uname;
+  document.getElementById('modalReportedAt').innerText   = btn.dataset.date;
+  document.getElementById('modalReportText').innerText   = btn.dataset.text;
+
+  document.getElementById('reportModal').style.display = 'block';
+}
+
+function closeReportModal() {
+  document.getElementById('reportModal').style.display = 'none';
+}
+</script>

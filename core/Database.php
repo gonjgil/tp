@@ -31,4 +31,9 @@ class Database
         return $this->conn->prepare($sql);
     }
 
+    public function getConnection(): mysqli
+    {
+        return $this->conn;
+    }
+
 }

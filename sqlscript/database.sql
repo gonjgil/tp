@@ -97,11 +97,16 @@ CREATE TABLE IF NOT EXISTS game_questions (
 
 /* REPORTES (tabla) */
 CREATE TABLE IF NOT EXISTS reports (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    id_question INT NOT NULL,
-    report TEXT NOT NULL,
-    FOREIGN KEY (id_question) REFERENCES questions(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+     id             INT          AUTO_INCREMENT PRIMARY KEY,
+     id_question    INT          NOT NULL,
+     report         TEXT         NOT NULL,
+     reported_by    INT          NOT NULL,
+     reported_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (reported_by)  REFERENCES users(id),
+    FOREIGN KEY (id_question)  REFERENCES questions(id)
+    ) ENGINE=InnoDB
+    DEFAULT CHARSET=utf8mb4
+    COLLATE=utf8mb4_general_ci;
 
 /* GENEROS (datos) */
 INSERT IGNORE INTO gender (type) VALUES

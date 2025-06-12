@@ -39,7 +39,8 @@ public function submitReport() {
     $questionId = (int)$_POST['question_id'];
     $reportText = $_POST['report'];
 
-    $this->reportModel->saveReport($questionId, $reportText);
+    $userId = $_SESSION['user']['id'];
+    $this->reportModel->createReport($questionId, $userId, $reportText);
     $this->reportModel->markQuestionReported($questionId);
 
     $wasCorrect = $_SESSION['last_answer_correct'] ?? false;
@@ -52,5 +53,12 @@ public function submitReport() {
     }
     exit();
 }
+    public function reported() {
+        $list = $this->reportModel
+            ->getReportedQuestionsWithDetails();
+        echo $this->view->render('editorReportedList', [
+            'reports' => $list
+        ]);
+    }
 
 }
