@@ -1,0 +1,43 @@
+<div class="w3-container" style="margin-top:70px">
+    <div class="w3-container" style="margin:auto; margin-top:2rem">
+        <div class="w3-panel {{question.category_class}} w3-round-large w3-card-4 w3-padding-16">
+            <div class="w3-center w3-small">
+                <span class="w3-tag w3-round w3-text-white">{{question.category_name}}</span>
+                <h2 class="w3-center"><b>{{question.question_text}}</b></h2>
+            </div>
+        </div>
+
+        <div class="w3-content" style="margin-top:70px">
+            <div class="w3-row-padding w3-margin-top">
+                {{#options}}
+                    <div class="w3-padding-large w3-half w3-margin-bottom">
+                        <div class="w3-panel w3-deep-purple w3-round-large w3-card w3-padding-16
+                            {{#isCorrect}}w3-center w3-border-green{{/isCorrect}}
+                            {{^isCorrect}}w3-center w3-border-red{{/isCorrect}}
+                            w3-topbar w3-bottombar w3-leftbar w3-rightbar" 
+                            style="border-width: 3px; padding: 2px;">
+                            <h1 class="w3-large">{{answer_text}}</h1>
+                        </div>
+                    </div>
+                {{/options}}
+            </div>
+        </div>
+
+        <div class="w3-content">
+            <form method="post" action="/report/submitReport">
+                <input type="hidden" name="question_id" value="{{question.id}}">
+
+                <div class="w3-section">
+                    <label for="report">Reporte:</label>
+                    <textarea id="report" name="report" class="w3-input w3-border w3-round-large" placeholder="Detalla lo mejor posible los motivos de tu reporte" rows="5" required></textarea>
+                </div>
+
+                <div class="w3-center" style="margin-top:20px">
+                    <button class="w3-button w3-blue w3-round-large w3-padding-large" type="submit">
+                        Enviar reporte
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

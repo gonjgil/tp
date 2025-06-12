@@ -1,7 +1,7 @@
 <?php
-require_once("core/Database.php");
-require_once("core/MustachePresenter.php");
-require_once("core/Router.php");
+require_once ("core/Database.php");
+require_once ("core/MustachePresenter.php");
+require_once ("core/Router.php");
 
 require_once ("controller/HomeController.php");
 require_once ("controller/LoginController.php");
@@ -14,21 +14,21 @@ require_once ("controller/QuizController.php");
 require_once ("controller/RecordController.php");
 require_once ("controller/RankingController.php");
 require_once ("controller/PlayerProfileRankingController.php");
-
 require_once ("controller/CrearPreguntaController.php");
+require_once ("controller/ReportController.php");
 
-require_once("model/LoginModel.php");
-require_once("model/RegisterModel.php");
-require_once("model/AdminModel.php");
-require_once("model/EditorModel.php");
-require_once("model/PlayerModel.php");
-require_once("model/PerfilUsuarioModel.php");
-require_once("model/QuizModel.php");
-require_once("model/RecordModel.php");
-require_once("model/RankingModel.php");
-require_once("model/PlayerProfileRankingModel.php");
-
+require_once ("model/LoginModel.php");
+require_once ("model/RegisterModel.php");
+require_once ("model/AdminModel.php");
+require_once ("model/EditorModel.php");
+require_once ("model/PlayerModel.php");
+require_once ("model/PerfilUsuarioModel.php");
+require_once ("model/QuizModel.php");
+require_once ("model/RecordModel.php");
+require_once ("model/RankingModel.php");
+require_once ("model/PlayerProfileRankingModel.php");
 require_once ("model/CrearPreguntaModel.php");
+require_once ("model/ReportModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -112,6 +112,13 @@ class Configuration
         $model = new QuizModel($this->getDatabase());
         $view  = $this->getViewer();
         return new QuizController($model, $view);
+    }
+
+    public function getReportController(){
+    $reportModel = new ReportModel($this->getDatabase());
+    $quizModel = new QuizModel($this->getDatabase());
+    $view  = $this->getViewer();
+    return new ReportController($reportModel, $quizModel);
     }
 
     public function getRecordController(){

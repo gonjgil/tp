@@ -63,8 +63,6 @@ class QuizModel {
         $stmt->execute();
     }
 
-
-
     public function getUserDifficulty(int $userId){
         $sql = "SELECT difficulty FROM users WHERE id = ?";
         $stmt = $this->db->prepare($sql);
@@ -118,6 +116,15 @@ class QuizModel {
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
         return (bool)$row['is_correct'];
+    }
+    
+    public function getCorrectOptionId(int $questionId): ?int {
+        $sql = "SELECT id FROM answers WHERE question_id = ? AND is_correct = 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $questionId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        return $result ? (int)$result['id'] : null;
     }
 
     public function incrementScore(int $gameId) {
@@ -205,8 +212,4 @@ class QuizModel {
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
-
-
-
-
 }

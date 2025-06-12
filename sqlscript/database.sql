@@ -95,6 +95,14 @@ CREATE TABLE IF NOT EXISTS game_questions (
     FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+/* REPORTES (tabla) */
+CREATE TABLE IF NOT EXISTS reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_question INT NOT NULL,
+    report TEXT NOT NULL,
+    FOREIGN KEY (id_question) REFERENCES questions(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 /* GENEROS (datos) */
 INSERT IGNORE INTO gender (type) VALUES
         ('Masculino'),
