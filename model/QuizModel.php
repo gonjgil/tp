@@ -157,38 +157,71 @@ class QuizModel {
     }
 
     public function incrementTimesAnsweredQuestions(int $questionId){
-        $sql = "UPDATE questions SET times_answered = times_answered + 1 WHERE id = ?";
-        $this->db->prepare($sql)->execute([$questionId]);
+        $sql  = "UPDATE questions 
+             SET times_answered = times_answered + 1 
+             WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $questionId);
+        $stmt->execute();
+        $stmt->close();
     }
 
     public function incrementTimesIncorrectQuestions(int $questionId){
-        $sql = "UPDATE questions SET times_incorrect = times_incorrect + 1 WHERE id = ?";
-        $this->db->prepare($sql)->execute([$questionId]);
+        $sql  = "UPDATE questions 
+             SET times_incorrect = times_incorrect + 1 
+             WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $questionId);
+        $stmt->execute();
+        $stmt->close();
     }
 
     public function updateDifficultyQuestions(int $questionId){
-        $sql = "UPDATE questions SET difficulty = CASE WHEN times_answered > 0 THEN (100 * times_incorrect / times_answered)
-                ELSE 100 END WHERE id = ?";
-        $this->db->prepare($sql)->execute([$questionId]);
+        $sql  = "UPDATE questions 
+             SET difficulty = CASE 
+                                WHEN times_answered > 0 
+                                  THEN (100 * times_incorrect / times_answered)
+                                ELSE 100
+                              END
+             WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $questionId);
+        $stmt->execute();
+        $stmt->close();
     }
-
 
     public function incrementTotalAnswersUser(int $userId) {
-        $sql = "UPDATE users SET total_answers = total_answers + 1 WHERE id = ?";
-        $this->db->prepare($sql)->execute([$userId]);
+        $sql  = "UPDATE users 
+             SET total_answers = total_answers + 1 
+             WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->close();
     }
-
 
     public function incrementCorrectAnswersUser(int $userId){
-        $sql = "UPDATE users SET correct_answers = correct_answers + 1 WHERE id = ?";
-        $this->db->prepare($sql)->execute([$userId]);
+        $sql  = "UPDATE users 
+             SET correct_answers = correct_answers + 1 
+             WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->close();
     }
 
-
     public function updateUserDifficulty(int $userId){
-        $sql = "UPDATE users SET difficulty = CASE WHEN total_answers >= 6 THEN (1 - (correct_answers / total_answers))
-                ELSE difficulty END WHERE id = ?";
-        $this->db->prepare($sql)->execute([$userId]);
+        $sql  = "UPDATE users 
+             SET difficulty = CASE 
+                                WHEN total_answers >= 6 
+                                  THEN (1 - (correct_answers / total_answers))
+                                ELSE difficulty 
+                              END
+             WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->close();
     }
 
     public function incrementTotalQuestions(int $gameId) {
