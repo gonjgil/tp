@@ -1,5 +1,4 @@
 <?php
-
 class QuizController {
     private $model, $view;
 
@@ -20,22 +19,21 @@ class QuizController {
     }
 
     public function next() {
-        if ($this->isTimeout()) {
-            $this->endGame('timeout');
+        $this->handleQuestionTimeout();
 
-        } else if ($this->renderCurrentQuestion()) {
-
-        } else {
-            $question = $this->fetchNextQuestion();
-
-            if ($question) {
-                $this->renderNewQuestion($question);
-            } else {
-                $this->view->render('error', array('message' => 'No hay preguntas disponibles.'));
-            }
+        if ($this->renderCurrentQuestionIfExists()) {
+            return;
         }
-    }
 
+        $q = $this->getNextAvailableQuestion();
+
+        if (!$q) {
+            $this->view->render('error', ['message' => 'No hay preguntas disponibles.']);
+            return;
+        }
+
+        $this->renderNewQuestion($q);
+    }
 
     public function answer() {
         if (!$this->isAnswerRequestValid()) {
