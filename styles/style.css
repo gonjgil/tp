@@ -22,3 +22,13 @@
 .label {
   margin-top: 10px;
 }
+
+.fade-out {
+  animation: startFade 5s forwards;
+}
+
+@keyframes startFade {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

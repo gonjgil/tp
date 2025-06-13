@@ -8,18 +8,22 @@ class CrearPreguntaModel {
     }
 
     public function guardarPregunta($pregunta, $opciones, $respuestaCorrecta, $categoriaId, $creatorId) {
-        $query = $this->db->prepare("INSERT INTO questions (question_text, category_id, creator_id, approved, reported, difficulty, times_answered, times_incorrect)
-                                 VALUES (?, ?, ?, 0, 0, 100, 0, 0)");
-        $query->execute([$pregunta, $categoriaId, $creatorId]);
+        $query = "INSERT INTO questions (category_id, creator_id, question_text, approved, reported, suggested, times_answered, times_incorrect, difficulty)
+                                VALUES (?, ?, ?, 0, 0, 1, 0, 0, 100)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("iis", $categoriaId, $creatorId, $pregunta);
+        $stmt->execute();
+        $questionId = $this->db->getConnection()->insert_id;
+        $stmt->close();
 
-        $questionId = $this->db->lastInsertId();
-
-        foreach ($opciones as $letra => $texto) {
-            $esCorrecta = ($letra === $respuestaCorrecta) ? 1 : 0;
-            $stmt = $this->db->prepare("INSERT INTO answers (question_id, answer_text, is_correct)
-                                    VALUES (?, ?, ?)");
-            $stmt->execute([$questionId, $texto, $esCorrecta]);
+        $query2 = "INSERT INTO answers (question_id, answer_text, is_correct) VALUES (?, ?, ?)";
+        $stmt2 = $this->db->prepare($query2);
+        foreach ($opciones as $opcion => $texto) {
+            $esCorrecta = ($opcion === $respuestaCorrecta) ? 1 : 0;
+            $stmt2->bind_param("isi", $questionId, $texto, $esCorrecta);
+            $stmt2->execute();
         }
+        $stmt2->close();
     }
 
     public function getCategories() {

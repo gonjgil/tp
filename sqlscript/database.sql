@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS questions (
     question_text VARCHAR(255) NOT NULL,
     approved TINYINT(1) NOT NULL DEFAULT 0,
     reported TINYINT(1) NOT NULL DEFAULT 0,
+    suggested TINYINT(1) NOT NULL DEFAULT 0,
     times_answered INT(11) NOT NULL DEFAULT 0,
     times_incorrect INT(11) NOT NULL DEFAULT 0,
     difficulty FLOAT NOT NULL DEFAULT 100,
@@ -104,9 +105,7 @@ CREATE TABLE IF NOT EXISTS reports (
      reported_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reported_by)  REFERENCES users(id),
     FOREIGN KEY (id_question)  REFERENCES questions(id)
-    ) ENGINE=InnoDB
-    DEFAULT CHARSET=utf8mb4
-    COLLATE=utf8mb4_general_ci;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /* GENEROS (datos) */
 INSERT IGNORE INTO gender (type) VALUES

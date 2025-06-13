@@ -1,6 +1,6 @@
 <?php
 
-class PlayerController{
+class PlayerController {
     private $model;
     private $view;
 
@@ -17,6 +17,11 @@ class PlayerController{
 
     public function panel()
     {
-        $this->model->render("player");
+        $mensaje = $_SESSION['mensaje'] ?? null;
+        unset($_SESSION['mensaje']);
+
+        $this->model->render("player", [
+            'mensaje' => $mensaje
+        ]);
     }
 }
