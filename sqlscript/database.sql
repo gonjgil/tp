@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS questions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     category_id INT NOT NULL,
     creator_id INT NULL, -- ahora permite nulls
+    created_at  DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     question_text VARCHAR(255) NOT NULL,
     approved TINYINT(1) NOT NULL DEFAULT 0,
     reported TINYINT(1) NOT NULL DEFAULT 0,

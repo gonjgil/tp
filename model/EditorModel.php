@@ -146,4 +146,70 @@ class EditorModel {
         $stmt->execute();
         $stmt->close();
     }
+
+    public function getSuggestedQuestions(): array {
+        $sql = "
+      SELECT
+        q.id,
+        q.question_text,
+        c.name     AS category_name,
+        u.username AS creator,
+        q.created_at
+      FROM questions q
+      JOIN categories c   ON c.id = q.category_id
+      LEFT JOIN users      u ON u.id = q.creator_id 
+      WHERE q.suggested = 1
+      ORDER BY q.created_at DESC
+    ";
+        $res = $this->db->query($sql);
+        return $res
+            ? $res->fetch_all(MYSQLI_ASSOC)
+            : [];
+    }
+
+    public function getSuggestionById(int $qid): ?array {
+        $sqlQ = "
+      SELECT
+        q.id,
+        q.question_text,
+        u.username AS creator
+      FROM questions q
+      LEFT JOIN users u ON u.id = q.creator_id
+      WHERE q.id = ?
+    ";
+        $stmt = $this->db->prepare($sqlQ);
+        $stmt->bind_param("i", $qid);
+        $stmt->execute();
+        $qRes = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if (! $qRes) return null;
+
+        $sqlA = "
+      SELECT id, answer_text, is_correct
+      FROM answers
+      WHERE question_id = ?
+      ORDER BY id
+    ";
+        $stmt = $this->db->prepare($sqlA);
+        $stmt->bind_param("i", $qid);
+        $stmt->execute();
+        $aRes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+
+        return [
+            'question' => $qRes,
+            'answers'  => $aRes
+        ];
+    }
+
+    public function acceptSuggestion(int $qid): void {
+        $sql = "UPDATE questions
+              SET suggested = 0,
+                  approved  = 1
+            WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $qid);
+        $stmt->execute();
+        $stmt->close();
+    }
 }

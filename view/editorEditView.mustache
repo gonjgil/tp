@@ -1,50 +1,65 @@
-<div class="w3-container w3-margin-top">
-  <h2>Editar Pregunta #{{question.id}}</h2>
+<div class="w3-container" style="margin-top:70px">
+  <div class="w3-container" style="margin:auto; max-width:600px;">
 
-  <!-- Eliminar -->
-  <a
-    href="/editor/delete/{{question.id}}"
-    onclick="return confirm('¿Eliminar pregunta #{{question.id}}?');"
-    class="w3-button w3-small w3-deep-orange"
-  >
-    Eliminar
-  </a>
+    <div class="w3-panel w3-card w3-round-large w3-padding-16 w3-light-grey">
 
-  <form method="post" action="/editor/editSubmit">
-    <input type="hidden" name="question_id" value="{{question.id}}">
+      <h2 class="w3-center"><b>Editar Pregunta #{{question.id}}</b></h2>
+      {{#mensaje}}
+      <div class="w3-panel w3-green w3-round-large w3-padding w3-margin-bottom">
+        {{mensaje}}
+      </div>
+      {{/mensaje}}
 
-    <div class="w3-margin-bottom">
-      <label class="w3-text-blue"><strong>Texto de la Pregunta</strong></label>
-      <textarea
-        name="question_text"
-        class="w3-input w3-border"
-        rows="3"
-        required
-      >{{question.question_text}}</textarea>
+
+      <form method="post" action="/editor/editSubmit">
+
+        <input type="hidden" name="question_id" value="{{question.id}}">
+
+        <div class="w3-section">
+          <label for="question_text"><b>Texto de la Pregunta</b></label>
+          <textarea
+            id="question_text"
+            name="question_text"
+            class="w3-input w3-border w3-round-large"
+            rows="3"
+            required
+          >{{question.question_text}}</textarea>
+        </div>
+
+        <h3>Respuestas</h3>
+        {{#answers}}
+        <div class="w3-section">
+          <input type="hidden"
+                 name="answers[{{id}}][id]"
+                 value="{{id}}">
+
+          <label for="answer_{{id}}"><b>Respuesta {{position}}</b></label>
+          <input
+            id="answer_{{id}}"
+            type="text"
+            name="answers[{{id}}][text]"
+            class="w3-input w3-border w3-round-large"
+            value="{{answer_text}}"
+            required
+          >
+
+          <label class="w3-margin-top">
+            <input type="radio" name="correct_answer" value="{{id}}" {{#is_correct}}checked{{/is_correct}}>
+            Correcta
+          </label>
+        </div>
+        {{/answers}}
+
+        <div class="w3-center w3-margin-top">
+          <button type="submit" class="w3-button w3-green w3-round-large w3-padding" style="width:200px;">
+            Guardar Cambios
+          </button>
+          <a href="/editor/all" class="w3-button w3-red w3-round-large w3-padding" style="width:200px; margin-left:10px;">
+            Cancelar
+          </a>
+        </div>
+
+      </form>
     </div>
-
-    <h3>Respuestas</h3>
-    {{#answers}}
-    <div class="w3-margin-bottom">
-      <input type="hidden"
-             name="answers[{{@index}}][id]"
-             value="{{id}}">
-      <label class="w3-text-blue"><strong>Respuesta {{@indexPlus1}}</strong></label>
-      <input type="text"
-             name="answers[{{@index}}][text]"
-             class="w3-input w3-border"
-             value="{{answer_text}}"
-             required>
-      <label class="w3-margin-left">
-        <input type="radio"
-               name="answers[{{@index}}][is_correct]"
-               {{#is_correct}}checked{{/is_correct}}>
-        Correcta
-      </label>
-    </div>
-    {{/answers}}
-
-    <button type="submit" class="w3-button w3-green">Guardar Cambios</button>
-    <a href="/editor/all" class="w3-button w3-red">Cancelar</a>
-  </form>
+  </div>
 </div>

@@ -34,7 +34,6 @@
         </td>
       </tr>
 
-      <!-- Aquí va el modal -->
       <div id="modal-{{question_id}}" class="w3-modal">
         <div class="w3-modal-content w3-animate-top w3-card-4">
           <header class="w3-container w3-win8-blue">
@@ -58,7 +57,7 @@
               <form action="/editor/toggle/{{question_id}}" method="post" style="display:inline">
                 <button
                   class="w3-button w3-small {{#approved}}w3-green{{/approved}}{{^approved}}w3-red{{/approved}}"
-                  onclick="return confirm('¿Cambiar estado aprobado para #{{question_id}}?');">
+                  onclick="return confirm('¿Cambiar de estado para pregunta #{{question_id}}?');">
                   {{#approved}}Activar{{/approved}}{{^approved}}Desactivar{{/approved}}
                 </button>
               </form>
@@ -75,7 +74,7 @@
                 <button
                   class="w3-button w3-small w3-deep-orange"
                   onclick="return confirm('¿Eliminar pregunta #{{question_id}}?');">
-                  Eliminar
+                  Eliminar pregunta
                 </button>
               </form>
 

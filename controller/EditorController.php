@@ -69,6 +69,10 @@ class EditorController {
             header('Location: /editor/all');
             exit;
         }
+        foreach ($data['answers'] as $i => &$answer) {
+            $answer['position'] = $i + 1;
+        }
+        unset($answer);
         echo $this->view->render('editorEdit', [
             'question' => $data['question'],
             'answers'  => $data['answers']
@@ -76,18 +80,50 @@ class EditorController {
     }
 
     public function editSubmit() {
-        $qid  = (int)$_POST['question_id'];
-        $text = trim($_POST['question_text']);
-        $this->model->updateQuestion($qid, $text);
+    $qid  = (int)$_POST['question_id'];
+    $text = trim($_POST['question_text']);
+    $this->model->updateQuestion($qid, $text);
 
-        foreach ($_POST['answers'] as $ans) {
-            $aid     = (int)$ans['id'];
-            $atext   = trim($ans['text']);
-            $correct = isset($ans['is_correct']) && $ans['is_correct'] === 'on';
-            $this->model->updateAnswer($aid, $atext, $correct);
+    $correctId = isset($_POST['correct_answer'])
+        ? (int)$_POST['correct_answer']
+        : null;
+
+    foreach ($_POST['answers'] as $ans) {
+        $aid   = (int)$ans['id'];
+        $atext = trim($ans['text']);
+        // se marca correcta solo si coincide con $correctId
+        $isCorrect = ($aid === $correctId);
+
+        $this->model->updateAnswer($aid, $atext, $isCorrect);
+    }
+
+    header('Location: /editor/all');
+    exit;
+}
+
+    public function suggested() {
+        $list = $this->model->getSuggestedQuestions();
+        echo $this->view->render('editorSuggestedList', [
+            'questions' => $list
+        ]);
+    }
+
+    public function viewSuggestion($id) {
+        $data = $this->model->getSuggestionById((int)$id);
+        if (! $data) {
+            header('Location: /editor/suggested');
+            exit;
         }
+        echo $this->view->render('editorSuggested', [
+            'question' => $data['question'],
+            'answers'  => $data['answers']
+        ]);
+    }
 
-        header('Location: /editor/all');
+    public function acceptSuggestion($id) {
+        $this->model->acceptSuggestion((int)$id);
+        header('Location: /editor/suggested');
         exit;
     }
+
 }

@@ -5,7 +5,7 @@
       <tr class="w3-win8-blue">
         <th>ID</th>
         <th>Pregunta</th>
-        <th>Aprobada</th>
+        <th>Activa</th>
         <th>Reportada</th>
         <th>Acciones</th>
       </tr>
@@ -15,8 +15,22 @@
       <tr>
         <td>{{id}}</td>
         <td>{{question_text}}</td>
-        <td>{{#approved}}Sí{{/approved}}{{^approved}}No{{/approved}}</td>
-        <td>{{#reported}}Sí{{/reported}}{{^reported}}No{{/reported}}</td>
+        <td>
+          {{#approved}}
+            <span class="w3-text-green">Sí</span>
+          {{/approved}}
+          {{^approved}}
+            <span class="w3-text-red">No</span>
+          {{/approved}}
+        </td>
+        <td>
+          {{#reported}}
+            <span class="w3-text-green">Sí</span>
+          {{/reported}}
+          {{^reported}}
+            <span class="w3-text-red">No</span>
+          {{/reported}}
+        </td>
         <td>
           <!-- Toggle approved -->
           <form action="/editor/toggle/{{id}}" method="post" style="display:inline">
