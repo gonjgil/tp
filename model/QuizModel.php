@@ -3,7 +3,7 @@ class QuizModel {
     private $db;
     public function __construct($database) { $this->db = $database; }
 
-    public function startGame(int $userId): int {
+    public function startGame(int $userId) {
         $sql  = "INSERT INTO games (user_id) VALUES (?)";
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $userId);
@@ -72,7 +72,7 @@ class QuizModel {
         return $result ? (float)$result['difficulty'] : 0.2; // facil
     }
 
-    public function getDifficultyRangeForUser(float $userDifficulty): array {
+    public function getDifficultyRangeForUser(float $userDifficulty){
         if ($userDifficulty <= 0.3) {
             return [70, 100];
         } else {
@@ -109,7 +109,7 @@ class QuizModel {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function checkCorrect(int $optionId): bool {
+    public function checkCorrect(int $optionId){
         $sql = "SELECT is_correct FROM answers WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $optionId);
@@ -118,7 +118,7 @@ class QuizModel {
         return (bool)$row['is_correct'];
     }
     
-    public function getCorrectOptionId(int $questionId): ?int {
+    public function getCorrectOptionId(int $questionId){
         $sql = "SELECT id FROM answers WHERE question_id = ? AND is_correct = 1";
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $questionId);

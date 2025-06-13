@@ -1,13 +1,21 @@
 <?php
-class QuizController {
+
+
+
+class QuizController
+{
     private $model, $view;
 
-    public function __construct($model, $view) {
+    public function __construct($model, $view)
+    {
         $this->model = $model;
-        $this->view  = $view;
+        $this->view = $view;
     }
 
-    public function newGame() {
+    // metodo princiapales
+
+    public function newGame()
+    {
         $gameId = $this->model->startGame((int)$_SESSION['user']['id']);
         $_SESSION['current_game'] = (int)$gameId;
         $_SESSION['asked_questions'] = [];
@@ -18,185 +26,188 @@ class QuizController {
         exit();
     }
 
-    public function next() {
-        $this->handleQuestionTimeout();
+    public function next()
+    {
+        if ($this->isTimedOut()) {
+            $this->handleTimeout();
+        } elseif (isset($_SESSION['current_question_id'])) {
+            $this->renderCurrentQuestion();
+        } else {
+            $question = $this->getNextAvailableQuestion();
 
-        if ($this->renderCurrentQuestionIfExists()) {
-            return;
+            if ($question) {
+                $this->renderNewQuestion($question);
+            } else {
+                $this->view->render('error', ['message' => 'No hay preguntas disponibles.']);
+            }
         }
-
-        $q = $this->getNextAvailableQuestion();
-
-        if (!$q) {
-            $this->view->render('error', ['message' => 'No hay preguntas disponibles.']);
-            return;
-        }
-
-        $this->renderNewQuestion($q);
     }
 
-    public function answer() {
+    public function answer()
+    {
         if (!$this->isAnswerRequestValid()) {
             $this->endAsCheat();
-        }
-
-        $questionId = (int)$_POST['question_id'];
-        $optionId = (int)$_POST['answer'];
-        $submittedStartTime = (int)$_POST['question_start_time'];
-
-        if ($questionId !== $_SESSION['current_question_id'] || $submittedStartTime !== $_SESSION['question_start_time']) {
+        } elseif (!$this->isSignatureValid()) {
             $this->endAsCheat();
-        }
-
-        $expectedSignature = $this->generateSignature($questionId, $submittedStartTime);
-        if ($_SESSION['signature'] !== $expectedSignature) {
-            $this->endAsCheat();
-        }
-
-        $elapsed = time() - $_SESSION['question_start_time'];
-        if ($elapsed > 15) {
-            $this->clearQuestionState();
+        } elseif ($this->isAnswerTimeout()) {
             $_SESSION['finish_reason'] = 'timeout';
+            $this->clearQuestionState();
             header("Location: /quiz/finish");
             exit();
-        }
-
-        if (!in_array($optionId, array_column($_SESSION['current_options'], 'id'))) {
+        } elseif (!$this->isValidOption((int)$_POST['answer'])) {
             $this->endAsCheat();
-        }
-
-        $correct = $this->model->checkCorrect($optionId);
-        $userId  = $_SESSION['user']['id'];
-        $gameId  = $_SESSION['current_game'];
-
-        $this->model->saveQuestionToGame($gameId, $questionId);
-        $this->model->incrementTotalAnswersUser($userId);
-        $this->model->incrementTotalQuestions($gameId);
-
-        if ($correct) {
-            $this->model->incrementScore($gameId);
-            $this->model->incrementCorrectAnswersUser($userId);
-            $_SESSION['last_answer_correct'] = true;
         } else {
-            $this->model->incrementTimesIncorrectQuestions($questionId);
-            $_SESSION['last_answer_correct'] = false;
-            $_SESSION['finish_reason'] = 'wrong';
+            $this->processAnswer();
+            header("Location: /quiz/feedback");
+            exit();
         }
-
-        $this->model->updateDifficultyQuestions($questionId);
-        $this->model->updateUserDifficulty($userId);
-
-        $_SESSION['selected_option_id'] = $optionId;
-        $_SESSION['last_question_id'] = $questionId;
-
-        $this->clearQuestionState();
-
-        header("Location: /quiz/feedback");
-        exit();
     }
 
-    public function feedback() {
-        if (!isset($_SESSION['last_answer_correct'], $_SESSION['last_question_id'], $_SESSION['current_options'])) {
+//    public function feedback()
+//    {
+//        if (!isset($_SESSION['last_answer_correct'], $_SESSION['last_question_id'], $_SESSION['current_options'])) {
+//            header("Location: /quiz/next");
+//            exit();
+//        }
+//
+//        $correct = $_SESSION['last_answer_correct'];
+//        $questionId = (int)$_SESSION['last_question_id'];
+//        $opts = $_SESSION['current_options'];
+//        $q = $this->model->getQuestionById($questionId);
+//        $q['category_class'] = $this->getCategoryClass($q['category_name']);
+//        $q['question_start_time'] = $_SESSION['question_start_time'];
+//        $score = $this->model->getScore((int)$_SESSION['current_game']);
+//
+//        $correctOptionId = $this->model->getCorrectOptionId($questionId);
+//        $selectedOptionId = $_SESSION['selected_option_id'];
+//
+//        foreach ($opts as &$opt) {
+//            $opt['isSelected'] = ($opt['id'] == $selectedOptionId);
+//            $opt['isCorrectAnswer'] = ($opt['id'] == $correctOptionId);
+//            $opt['panelClass'] = $opt['isSelected']
+//                ? ($opt['isCorrectAnswer'] ? 'w3-border w3-border-green w3-topbar w3-bottombar w3-leftbar w3-rightbar'
+//                    : 'w3-border w3-border-red w3-topbar w3-bottombar w3-leftbar w3-rightbar')
+//                : '';
+//        }
+//        unset($opt);
+//
+//        $this->view->render('question', [
+//            'question' => $q,
+//            'options' => $opts,
+//            'score' => $score,
+//            'feedback' => ['isCorrect' => $correct]
+//        ]);
+//
+//        $this->clearFeedbackState();
+//    }
+
+    public function feedback()
+    {
+        if (!$this->hasFeedbackSessionData()) {
             header("Location: /quiz/next");
             exit();
         }
 
-        $correct = $_SESSION['last_answer_correct'];
         $questionId = (int)$_SESSION['last_question_id'];
-
-        $q = $this->model->getQuestionById($questionId);
-        $opts = $_SESSION['current_options'];
-        $score = $this->model->getScore((int)$_SESSION['current_game']);
-        $q['category_class'] = $this->getCategoryClass($q['category_name']);
-
-        $correctOptionId = $this->model->getCorrectOptionId($questionId);
         $selectedOptionId = $_SESSION['selected_option_id'];
+        $correct = $_SESSION['last_answer_correct'];
+        $options = $_SESSION['current_options'];
+        $score = $this->model->getScore((int)$_SESSION['current_game']);
 
-        foreach ($opts as &$opt) {
-            $opt['isSelected'] = ($opt['id'] == $selectedOptionId);
-            $opt['isCorrectAnswer'] = ($opt['id'] == $correctOptionId);
-            $opt['panelClass'] = '';
-
-            if ($opt['isSelected']) {
-                if ($opt['isCorrectAnswer']) {
-                    $opt['panelClass'] = 'w3-border w3-border-green w3-topbar w3-bottombar w3-leftbar and w3-rightbar';
-                } else {
-                    $opt['panelClass'] = 'w3-border w3-border-red w3-topbar w3-bottombar w3-leftbar and w3-rightbar';
-                }
-            }
-        }
-        unset($opt);
+        $question = $this->prepareQuestionData($questionId);
+        $correctOptionId = $this->model->getCorrectOptionId($questionId);
+        $preparedOptions = $this->prepareOptionsFeedback($options, $selectedOptionId, $correctOptionId);
 
         $this->view->render('question', [
-            'question' => $q,
-            'options'  => $opts,
-            'score'    => $score,
+            'question' => $question,
+            'options' => $preparedOptions,
+            'score' => $score,
             'feedback' => ['isCorrect' => $correct]
         ]);
 
         $this->clearFeedbackState();
     }
 
-    public function finish() {
+
+    public function finish()
+    {
         $score = $this->model->getScore((int)$_SESSION['current_game']);
         $total = $this->model->getTotalCorrectByUser((int)$_SESSION['user']['id']);
-
         $reason = $_SESSION['finish_reason'] ?? null;
         unset($_SESSION['finish_reason']);
 
-        $reasonText = match($reason) {
-            'wrong'   => 'Respuesta incorrecta',
+        $reasonText = match ($reason) {
+            'wrong' => 'Respuesta incorrecta',
             'timeout' => 'Su tiempo se terminó',
-            'cheat'   => 'Partida finalizada por trampa',
-            default   => 'Partida finalizada'
+            'cheat' => 'Partida finalizada por trampa',
+            default => 'Partida finalizada'
         };
 
         $this->view->render('quizSummary', [
-            'score'  => $score,
-            'total'  => $total,
+            'score' => $score,
+            'total' => $total,
             'reason' => $reasonText,
         ]);
     }
 
-    private function handleQuestionTimeout() {
-        if (isset($_SESSION['question_start_time'])) {
-            $elapsed = time() - (int)$_SESSION['question_start_time'];
-            if ($elapsed > 15) {
-                $this->clearQuestionState();
-                $_SESSION['finish_reason'] = 'timeout';
-                header("Location: /quiz/finish");
-                exit();
-            }
+    public function report()
+    {
+        $questionId = (int)$_GET['question_id'];
+        $q = $this->model->getQuestionById($questionId);
+        $options = $this->model->getOptionsByQuestion($questionId);
+        $correctOptionId = $this->model->getCorrectOptionId($questionId);
+
+        foreach ($options as &$opt) {
+            $opt['isCorrect'] = ($opt['id'] == $correctOptionId);
         }
+
+        $q['category_class'] = $this->getCategoryClass($q['category_name']);
+
+        $this->view->render('report', [
+            'question' => $q,
+            'options' => $options
+        ]);
     }
 
-    private function renderCurrentQuestionIfExists() {
-        if (isset($_SESSION['current_question_id'])) {
-            $questionId = (int)$_SESSION['current_question_id'];
-            $q = $this->model->getQuestionById($questionId);
-            if (!$q) {
-                $this->view->render('error', ['message' => 'Pregunta no encontrada.']);
-                return true;
-            }
+    // metodos aux
 
+    private function isTimedOut()
+    {
+        return isset($_SESSION['question_start_time']) && (time() - (int)$_SESSION['question_start_time']) > 15;
+    }
+
+    private function handleTimeout()
+    {
+        $_SESSION['finish_reason'] = 'timeout';
+        header("Location: /quiz/finish");
+        exit();
+    }
+
+    private function renderCurrentQuestion()
+    {
+        $questionId = (int)$_SESSION['current_question_id'];
+        $q = $this->model->getQuestionById($questionId);
+
+        if (!$q) {
+            $this->view->render('error', ['message' => 'Pregunta no encontrada.']);
+        } else {
             $opts = $_SESSION['current_options'] ?? $this->model->getOptionsByQuestion($questionId);
             $_SESSION['current_options'] = $opts;
 
-            $score = $this->model->getScore((int)$_SESSION['current_game']);
             $q['category_class'] = $this->getCategoryClass($q['category_name']);
             $q['question_start_time'] = $_SESSION['question_start_time'];
+            $score = $this->model->getScore((int)$_SESSION['current_game']);
 
             $this->view->render('question', [
                 'question' => $q,
-                'options'  => $opts,
-                'score'    => $score
+                'options' => $opts,
+                'score' => $score
             ]);
-            return true;
         }
-        return false;
     }
 
-    private function getNextAvailableQuestion() {
+    private function getNextAvailableQuestion()
+    {
         $asked = $_SESSION['asked_questions'] ?? [];
         $q = $this->model->getRandomQuestion($asked);
 
@@ -209,58 +220,32 @@ class QuizController {
         return $q;
     }
 
-    private function renderNewQuestion(array $q) {
-        $_SESSION['asked_questions'][] = (int)$q['id'];
-        $_SESSION['current_question_id'] = (int)$q['id'];
+    private function renderNewQuestion(array $q)
+    {
+        $qId = (int)$q['id'];
+        $_SESSION['asked_questions'][] = $qId;
+        $_SESSION['current_question_id'] = $qId;
         $_SESSION['question_start_time'] = time();
+        $_SESSION['signature'] = $this->generateSignature($qId, $_SESSION['question_start_time']);
 
-        $_SESSION['signature'] = $this->generateSignature((int)$q['id'], $_SESSION['question_start_time']);
+        $this->model->incrementTimesAnsweredQuestions($qId);
 
-        $this->model->incrementTimesAnsweredQuestions((int)$q['id']);
-
-        $opts  = $this->model->getOptionsByQuestion((int)$q['id']);
+        $opts = $this->model->getOptionsByQuestion($qId);
         $_SESSION['current_options'] = $opts;
 
-        $score = $this->model->getScore((int)$_SESSION['current_game']);
         $q['category_class'] = $this->getCategoryClass($q['category_name']);
         $q['question_start_time'] = $_SESSION['question_start_time'];
+        $score = $this->model->getScore((int)$_SESSION['current_game']);
 
         $this->view->render('question', [
             'question' => $q,
-            'options'  => $opts,
-            'score'    => $score
+            'options' => $opts,
+            'score' => $score
         ]);
     }
 
-    private function getCategoryClass(string $categoryName) {
-        return match(strtolower($categoryName)) {
-            'cultura general' => 'w3-red',
-            'ciencia'         => 'w3-blue',
-            'historia'        => 'w3-purple',
-            default           => 'w3-grey'
-        };
-    }
-
-    private function endAsCheat() {
-        $_SESSION['finish_reason'] = 'cheat';
-        $this->model->endGame($_SESSION['current_game'] ?? null);
-        header("Location: /quiz/finish");
-        exit();
-    }
-
-    private function clearQuestionState() {
-        unset($_SESSION['question_start_time'], $_SESSION['current_question_id'], $_SESSION['signature']);
-    }
-
-    private function clearFeedbackState() {
-        unset($_SESSION['last_question_id'], $_SESSION['current_options'], $_SESSION['selected_option_id']);
-    }
-
-    private function clearReportState() {
-        unset($_SESSION['last_answer_correct']);
-    }
-
-    private function isAnswerRequestValid() {
+    private function isAnswerRequestValid()
+    {
         return isset(
             $_SESSION['question_start_time'],
             $_SESSION['current_question_id'],
@@ -272,26 +257,141 @@ class QuizController {
         );
     }
 
-    private function generateSignature($questionId, $startTime) {
+    private function isSignatureValid()
+    {
+        $questionId = (int)$_POST['question_id'];
+        $startTime = (int)$_POST['question_start_time'];
+        return $_SESSION['signature'] === $this->generateSignature($questionId, $startTime);
+    }
+
+    private function isAnswerTimeout()
+    {
+        $startTime = (int)$_POST['question_start_time'];
+        return (time() - $startTime) > 15;
+    }
+
+    private function isValidOption(int $optionId)
+    {
+        return in_array($optionId, array_column($_SESSION['current_options'], 'id'));
+    }
+
+    private function processAnswer()
+    {
+        $questionId = (int)$_POST['question_id'];
+        $optionId = (int)$_POST['answer'];
+        $userId = $_SESSION['user']['id'];
+        $gameId = $_SESSION['current_game'];
+        $isCorrect = $this->model->checkCorrect($optionId);
+
+        $this->model->saveQuestionToGame($gameId, $questionId);
+        $this->model->incrementTotalAnswersUser($userId);
+        $this->model->incrementTotalQuestions($gameId);
+
+        if ($isCorrect) {
+            $this->handleCorrectAnswer($gameId, $userId);
+        } else {
+            $this->handleIncorrectAnswer($questionId, $userId);
+        }
+
+        $this->model->updateDifficultyQuestions($questionId);
+        $this->model->updateUserDifficulty($userId);
+
+        $_SESSION['selected_option_id'] = $optionId;
+        $_SESSION['last_question_id'] = $questionId;
+
+        $this->clearQuestionState();
+    }
+
+    private function handleCorrectAnswer(int $gameId, int $userId)
+    {
+        $this->model->incrementScore($gameId);
+        $this->model->incrementCorrectAnswersUser($userId);
+        $_SESSION['last_answer_correct'] = true;
+    }
+
+    private function handleIncorrectAnswer(int $questionId, int $userId)
+    {
+        $this->model->incrementTimesIncorrectQuestions($questionId);
+        $_SESSION['last_answer_correct'] = false;
+        $_SESSION['finish_reason'] = 'wrong';
+    }
+
+    private function endAsCheat()
+    {
+        $_SESSION['finish_reason'] = 'cheat';
+        $this->model->endGame($_SESSION['current_game'] ?? null);
+        header("Location: /quiz/finish");
+        exit();
+    }
+
+    private function generateSignature($questionId, $startTime)
+    {
         return hash('sha256', $questionId . '|' . $_SESSION['user']['id'] . '|' . $startTime);
     }
 
-    public function report() {
-        $questionId = (int)$_GET['question_id'];
-
-        $q = $this->model->getQuestionById($questionId);
-        $options = $this->model->getOptionsByQuestion($questionId);
-        $correctOptionId = $this->model->getCorrectOptionId($questionId);
-
-        foreach ($options as &$opt) {
-            $opt['isCorrect'] = ($opt['id'] == $correctOptionId);
-        }
-
-        $q['category_class'] = $this->getCategoryClass($q['category_name']);
-               
-        $this->view->render('report', [
-            'question' => $q,
-            'options' => $options
-        ]);
+    private function getCategoryClass(string $categoryName): string
+    {
+        return match (strtolower($categoryName)) {
+            'cultura general' => 'w3-red',
+            'ciencia' => 'w3-blue',
+            'historia' => 'w3-purple',
+            default => 'w3-grey'
+        };
     }
+
+    private function clearQuestionState()
+    {
+        unset($_SESSION['question_start_time'], $_SESSION['current_question_id'], $_SESSION['signature']);
+    }
+
+    private function clearFeedbackState()
+    {
+        unset($_SESSION['last_question_id'], $_SESSION['current_options'], $_SESSION['selected_option_id']);
+    }
+
+    private function clearReportState()
+    {
+        unset($_SESSION['last_answer_correct']);
+    }
+
+
+
+
+
+
+    private function hasFeedbackSessionData()
+    {
+        return isset(
+            $_SESSION['last_answer_correct'],
+            $_SESSION['last_question_id'],
+            $_SESSION['current_options']
+        );
+    }
+
+    private function prepareQuestionData(int $questionId)
+    {
+        $question = $this->model->getQuestionById($questionId);
+        $question['category_class'] = $this->getCategoryClass($question['category_name']);
+        $question['question_start_time'] = $_SESSION['question_start_time'];
+        return $question;
+    }
+
+    private function prepareOptionsFeedback(array $options, int $selectedId, int $correctId)
+    {
+        foreach ($options as &$option) {
+            $option['isSelected'] = ($option['id'] == $selectedId);
+            $option['isCorrectAnswer'] = ($option['id'] == $correctId);
+            if ($option['isSelected']) {
+                $option['panelClass'] = $option['isCorrectAnswer']
+                    ? 'w3-border w3-border-green w3-topbar w3-bottombar w3-leftbar w3-rightbar'
+                    : 'w3-border w3-border-red w3-topbar w3-bottombar w3-leftbar w3-rightbar';
+            } else {
+                $option['panelClass'] = '';
+            }
+        }
+        unset($option);
+        return $options;
+    }
+
 }
+
