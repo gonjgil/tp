@@ -33,6 +33,7 @@ class MustachePresenter{
             }
         }
         $data['isLoginView'] = ($contentFile === 'login');
+        $data['isRegisterView'] = ($contentFile === 'register' || $contentFile === 'registerSuccess');
         $fullContentPath = $this->partialsPathLoader . '/' . $contentFile . "View.mustache";
         echo $this->generateHtml($fullContentPath, $data);
     }

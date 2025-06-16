@@ -16,6 +16,7 @@
 <body class="w3-display-container {{#isLoginView}} w3-deep-purple {{/isLoginView}}" style="height: 100vh" >
 
 {{^isLoginView}}
+{{^isRegisterView}}
 <div class="w3-top">
   <div class="w3-bar w3-padding w3-card w3-deep-purple w3-text-white">
         <a href="/" class="logo w3-bar-item w3-button">Código Trivia</a>
@@ -39,4 +40,5 @@
         {{/user}}
     </div>
 </div>
+{{/isRegisterView}}
 {{/isLoginView}}

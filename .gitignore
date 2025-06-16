@@ -2,3 +2,7 @@ __MACOSX/
 .idea/
 pendientes.txt
 screenshots/
+package.json
+package-lock.json
+.prettierrc.js
+node_modules/

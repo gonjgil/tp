@@ -86,3 +86,10 @@
   color: #fff !important;
   background-color: #a0522d !important;
 }
+
+.w3-input, .w3-select {
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white for inputs */
+}
+.w3-text-light-blue {
+    color: #add8e6 !important; /* Lighter blue for links */
+}
