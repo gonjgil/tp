@@ -1,18 +1,19 @@
 <?php
-class RegisterController
-{
+require_once 'core/emailSender.php';
+
+class RegisterController{
+
     private $view;
     private $model;
+    private $emailSender;
 
-    public function __construct($view, $registerModel)
-    {
+    public function __construct($view, $registerModel){
         $this->view = $view;
         $this->model = $registerModel;
         $this->emailSender = new emailSender();
     }
 
-    public function index()
-    {
+    public function index(){
         $this->view->render('register');
     }
 
@@ -41,21 +42,30 @@ class RegisterController
                 $data['username'],
                 $rawPassword,
                 $profilePicture,
-                3, // id_rol por defecto = jugador
-                0, // is_active = false, hasta que valide el mail
+                3,
+                0,
                 $token,
                 $lat,
                 $lng
             );
 
-            $body = $this->generateEmailBodyFor($newUser['name'], $newUser['last_name'], $newUser['id'], $token);
-            $this->emailSender->send($newUser['email'], $body);
+            $body = $this->generateEmailBodyFor(
+                $newUser['name'],
+                $newUser['last_name'],
+                $newUser['id'],
+                $token
+            );
 
-            $this->view->render('registerSuccess', ['message' => $body]);
+            $this->emailSender->send($newUser['email'], $body);
+            $this->view->render('registerSuccess');
         } else {
-            $this->view->render('register', ['errors' => $errors]);
+            $this->view->render('register', [
+                'errors' => $errors,
+                'old' => $data
+            ]);
         }
     }
+
 
     private function validateRegistrationData($data)
     {
@@ -129,29 +139,22 @@ class RegisterController
 
     public function generateEmailBodyFor($name, $last_name, $iduser, $token)
     {
-        return "<body>Hola $name " .
-            strtoupper($last_name) .
-            ($message = "
-                <p class='w3-center w3-large w3-text-black'>
-                    Creaste con éxito tu cuenta.
-                </p>
+        $link = "http://localhost/register/validateMail?iduser=$iduser&idverificador=$token";
 
-                <p class='w3-center w3-large w3-text-black'>
-                    Para validar tu nueva cuenta haz click en:
-                </p>
-
-                <p class='w3-center w3-large'>
-                    <a href='/register/validateMail?iduser=$iduser&idverificador=$token' class='w3-button w3-win8-blue w3-round-large w3-large'>
-                        Validar cuenta
-                    </a>
-                </p>
-                ");
+        return "
+        <body>
+            <p>Hola $name <strong>" . strtoupper($last_name) . "</strong>,</p>
+            <p>Creaste con éxito tu cuenta en Codigo Trivia.</p>
+            <p>Para validar tu nueva cuenta, dale click al boton de abajo</p>
+            <p>
+               <a href='$link'
+                  style='padding: 10px 20px; background-color: #337ab7; color: white; border-radius: 5px; text-decoration: none;'>
+                   Validar cuenta
+               </a>
+           </p>
+        </body>
+    ";
     }
+
 }
 
-class emailSender
-{
-    function send($email, $body)
-    {
-    }
-}
