@@ -31,6 +31,10 @@ class LoginController
             $this->view->render('login', ['error' => "Contraseña incorrecta"]);
             return;
         }
+        if ($user['is_active'] == 0) {
+            $this->view->render('login', ['error' => "Tenes que activar tu usuario"]);
+            return;
+        }
 
         $_SESSION['user'] = [
             'id' => $user['id'],
