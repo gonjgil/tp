@@ -126,4 +126,11 @@ class EditorController {
         exit;
     }
 
+    public function rejectSuggestion($id) {
+        $this->model->rejectSuggestion((int)$id);
+        header('Location: /editor/suggested');
+        exit;
+    }
+
+
 }

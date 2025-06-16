@@ -80,8 +80,32 @@ class QuizModel {
         }
     }
 
-    public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []){
-        $sql = "SELECT q.*, c.name AS category_name FROM questions q JOIN categories c ON q.category_id = c.id WHERE q.difficulty BETWEEN ? AND ?";
+//    public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []){
+//        $sql = "SELECT q.*, c.name AS category_name FROM questions q JOIN categories c ON q.category_id = c.id WHERE q.difficulty BETWEEN ? AND ?";
+//
+//        $params = [$minDiff, $maxDiff];
+//        $types = "ii";
+//
+//        if (count($excludeIds)) {
+//            $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
+//            $sql .= " AND q.id NOT IN ($placeholders)";
+//            $types .= str_repeat('i', count($excludeIds));
+//            $params = array_merge($params, $excludeIds);
+//        }
+//
+//        $sql .= " ORDER BY RAND() LIMIT 1";
+//
+//        $stmt = $this->db->prepare($sql);
+//        $stmt->bind_param($types, ...$params);
+//        $stmt->execute();
+//        return $stmt->get_result()->fetch_assoc() ?: null;
+//    }
+
+    public function findQuestionByDifficultyAndExclusion(int $minDiff, int $maxDiff, array $excludeIds = []) {
+        $sql = "SELECT q.*, c.name AS category_name 
+            FROM questions q 
+            JOIN categories c ON q.category_id = c.id 
+            WHERE q.difficulty BETWEEN ? AND ? AND q.approved = 1";
 
         $params = [$minDiff, $maxDiff];
         $types = "ii";

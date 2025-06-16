@@ -63,44 +63,6 @@ class QuizController
         }
     }
 
-//    public function feedback()
-//    {
-//        if (!isset($_SESSION['last_answer_correct'], $_SESSION['last_question_id'], $_SESSION['current_options'])) {
-//            header("Location: /quiz/next");
-//            exit();
-//        }
-//
-//        $correct = $_SESSION['last_answer_correct'];
-//        $questionId = (int)$_SESSION['last_question_id'];
-//        $opts = $_SESSION['current_options'];
-//        $q = $this->model->getQuestionById($questionId);
-//        $q['category_class'] = $this->getCategoryClass($q['category_name']);
-//        $q['question_start_time'] = $_SESSION['question_start_time'];
-//        $score = $this->model->getScore((int)$_SESSION['current_game']);
-//
-//        $correctOptionId = $this->model->getCorrectOptionId($questionId);
-//        $selectedOptionId = $_SESSION['selected_option_id'];
-//
-//        foreach ($opts as &$opt) {
-//            $opt['isSelected'] = ($opt['id'] == $selectedOptionId);
-//            $opt['isCorrectAnswer'] = ($opt['id'] == $correctOptionId);
-//            $opt['panelClass'] = $opt['isSelected']
-//                ? ($opt['isCorrectAnswer'] ? 'w3-border w3-border-green w3-topbar w3-bottombar w3-leftbar w3-rightbar'
-//                    : 'w3-border w3-border-red w3-topbar w3-bottombar w3-leftbar w3-rightbar')
-//                : '';
-//        }
-//        unset($opt);
-//
-//        $this->view->render('question', [
-//            'question' => $q,
-//            'options' => $opts,
-//            'score' => $score,
-//            'feedback' => ['isCorrect' => $correct]
-//        ]);
-//
-//        $this->clearFeedbackState();
-//    }
-
     public function feedback()
     {
         if (!$this->hasFeedbackSessionData()) {
