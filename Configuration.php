@@ -30,6 +30,7 @@ require_once ("model/PlayerProfileRankingModel.php");
 require_once ("model/CrearPreguntaModel.php");
 require_once ("model/ReportModel.php");
 
+include_once('vendor/autoload.php');
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
 class Configuration
