@@ -8,8 +8,10 @@ Options -Indexes
     RewriteEngine On
     RewriteBase /
 
-    # Permitir acceso directo a public/ y uploads/
-    RewriteRule ^(public|uploads|styles)($|/) - [L,NC]
+   # Permitir acceso directo a public/, uploads/, styles/ y qr.php
+   RewriteRule ^(public|uploads|styles)(/|$) - [L,NC]
+   RewriteRule ^qr\.php$ - [L]
+
 
     # Permitir archivos y carpetas existentes
     RewriteCond %{REQUEST_FILENAME} !-f

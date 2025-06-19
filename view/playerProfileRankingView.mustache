@@ -15,8 +15,7 @@
         <!-- qr -->
         <div class="w3-margin-top">
             <p><strong>Escaneá este QR para ver el perfil:</strong></p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://localhost/perfilUsuario/show/{{player.id}}"
-                 alt="QR Code">
+            <img src="/qr.php?id={{player.id}}" alt="QR Code">
             <p class="w3-large">O <a href="/perfilUsuario/show/{{player.id}}" class="w3-text-blue">tocá este link para ir al perfil</a></p>
         </div>
     </div>
