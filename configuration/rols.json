@@ -20,6 +20,7 @@
   },
   "admin": {
     "admin": [],
-    "perfilusuario": []
+    "perfilusuario": [],
+    "dashboard": []
   }
 }
