@@ -35,6 +35,19 @@ $data = $model->getQuestionsPerDay($filters);
 $labels = array_column($data, 'fecha');
 $values = array_map('intval', array_column($data, 'total'));
 
+if (empty($labels) || empty($values)) {
+    // Mostrar una imagen con mensaje
+    $im = imagecreatetruecolor(700, 200);
+    $white = imagecolorallocate($im, 255, 255, 255);
+    $black = imagecolorallocate($im, 0, 0, 0);
+    imagefilledrectangle($im, 0, 0, 700, 200, $white);
+    imagestring($im, 5, 180, 80, "No hay datos para las fechas seleccionadas.", $black);
+    header('Content-Type: image/png');
+    imagepng($im);
+    imagedestroy($im);
+    exit;
+}
+
 // 7) Dibuja el gráfico
 header('Content-Type: image/png');
 $graph = new Graph(700,400);

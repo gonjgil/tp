@@ -27,7 +27,8 @@ class AdminController {
     }
 
     public function dashboard() {
-        $filters = ['from'=>$_GET['from']??null,'to'=>$_GET['to']??null];
+        $today = date('Y-m-d');
+        $filters = ['from'=>$_GET['from'] ?? $today ,'to'=>$_GET['to'] ?? $today];
 
         //Datos para grafico categorias
         $stats   = $this->model->getQuestionsByCategory($filters);
@@ -44,7 +45,7 @@ class AdminController {
             'chartByDayUrl'   => $chartDayUrl,
         ]);
     }
-    
+
     public function exportarPDF() {
         // 1. Obtener los filtros de la URL
         $filters = ['from' => $_GET['from'] ?? null, 'to' => $_GET['to'] ?? null];
