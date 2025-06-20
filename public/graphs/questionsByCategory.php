@@ -33,15 +33,8 @@ $labels = array_column($data, 'category');
 $values = array_map('intval', array_column($data, 'total'));
 
 if (empty($labels) || empty($values)) {
-    // Mostrar una imagen con mensaje
-    $im = imagecreatetruecolor(700, 200);
-    $white = imagecolorallocate($im, 255, 255, 255);
-    $black = imagecolorallocate($im, 0, 0, 0);
-    imagefilledrectangle($im, 0, 0, 700, 200, $white);
-    imagestring($im, 5, 180, 80, "No hay datos para las fechas seleccionadas.", $black);
-    header('Content-Type: image/png');
-    imagepng($im);
-    imagedestroy($im);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "No hay datos para las fechas seleccionadas.";
     exit;
 }
 
