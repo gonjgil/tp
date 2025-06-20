@@ -1,13 +1,18 @@
 <div class="w3-container w3-padding-large" style="padding-top: 100px;">
-    <h2 class="w3-text-purple">Perfil de {{player.username}}</h2>
 
+    <br>
+    <br>
+    <br>
     <div class="w3-card w3-padding w3-margin-bottom w3-center">
-        <img src="/{{player.profile_picture}}" alt="Foto de perfil" class="w3-circle"
+        <img src="/{{player.profile_picture}}?v={{rand}}" alt="Foto de perfil"
+             class="w3-circle w3-border w3-border-black"
              style="width:120px; height:120px; object-fit: cover; margin-top: 16px;">
-        <h3>{{player.name}} {{player.last_name}}</h3>
+
+        <h2 class="w3-text-purple">Perfil de {{player.username}}</h2>
+
         <p><strong>Ciudad:</strong> {{player.city}}, {{player.country}}</p>
         <p><strong>Respuestas correctas:</strong> {{player.correct_answers}}</p>
-        <p><strong>Total de respuestas:</strong> {{player.total_answers}}</p>
+        <p><strong>Total de preguntas:</strong> {{player.total_answers}}</p>
         <p><strong>Porcentaje de aciertos:</strong> {{player.accuracy}}%</p>
 
         <div id="map" style="height: 300px;"></div>

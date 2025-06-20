@@ -12,15 +12,18 @@
     "record": [],
     "playerprofileranking": [],
     "crearpregunta": [],
-    "report": []
+    "report": [],
+    "editprofile": []
   },
   "editor": {
     "editor": [],
-    "perfilusuario": []
+    "perfilusuario": [],
+    "editprofile": []
   },
   "admin": {
     "admin": [],
     "perfilusuario": [],
-    "dashboard": []
+    "dashboard": [],
+    "editprofile": []
   }
 }

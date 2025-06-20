@@ -1,10 +1,17 @@
 <div class="w3-container w3-margin-top">
+
+    <br>
+    <br>
+    <br>
     <div class="w3-card-4 w3-white w3-round-large w3-padding-large w3-animate-opacity">
         <div class="w3-center">
-            <h2>Perfil de {{username}}</h2>
-            <img src="/{{profile_picture}}" alt="Foto de perfil"
-                 class="w3-circle" style="width:150px;height:150px;object-fit:cover;">
+            <img src="/{{profile_picture}}?v={{rand}}" alt="Foto de perfil"
+                 class="w3-circle w3-border w3-border-black"
+                 width="150" height="150">
         </div>
+
+
+        <h2 class="w3-text-purple">Perfil de Usuario</h2>
 
         <div class="w3-container w3-margin-top">
             <p><strong>Nombre:</strong> {{name}} {{last_name}}</p>
@@ -13,11 +20,16 @@
             <p><strong>País:</strong> {{country}}</p>
             <p><strong>Ciudad:</strong> {{city}}</p>
             <p><strong>Email:</strong> {{email}}</p>
-            <p><strong>Tipo de usuario:</strong> {{user_type}}</p>
             <p><strong>Fecha de registro:</strong> {{created_at}}</p>
             <p><strong>Ubicación:</strong></p>
             <div id="map" style="height: 300px; border-radius: 10px;"></div>
         </div>
+        {{#is_own_profile}}
+            <div class="w3-center w3-margin-top">
+                <a href="/perfilUsuario/edit" class="w3-button w3-purple w3-round-large">Editar Perfil</a>
+            </div>
+        {{/is_own_profile}}
+
     </div>
 </div>
 
