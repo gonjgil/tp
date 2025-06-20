@@ -30,24 +30,19 @@ class AdminController {
         $today = date('Y-m-d');
         $filters = ['from'=>$_GET['from'] ?? $today ,'to'=>$_GET['to'] ?? $today];
 
-        $dataByCategory = $this->model->getQuestionsByCategory($filters);
-        $dataByDay = $this->model->getQuestionsPerDay($filters);
-
         //Datos para grafico categorias
+        $stats   = $this->model->getQuestionsByCategory($filters);
         $chartUrl= '/public/graphs/questionsByCategory.php?'.http_build_query($filters);
 
         //Datos para grafico preguntas por dia
         $chartDayUrl   = '/public/graphs/questionsByDay.php?' . http_build_query($filters);
-        
-        $hasData = !empty($dataByCategory) || !empty($dataByDay);
 
         $this->view->render('adminDashboard', [
             'from'=>$filters['from'],
             'to'=>$filters['to'],
             'stats'=>$stats,
             'chartUrl'=>$chartUrl,
-            'hasData'=>$hasData,
-            'chartByDayUrl'=>$chartDayUrl,
+            'chartByDayUrl'   => $chartDayUrl,
         ]);
     }
 

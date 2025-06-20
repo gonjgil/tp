@@ -14,31 +14,21 @@
   <!-- Gráfico 1: Preguntas por categoría -->
   <div class="w3-panel w3-card w3-padding">
     <h3>Preguntas por Categoría</h3>
-    {{#hasData}}
     <img
       src="{{chartUrl}}"
       alt="Preguntas por categoría"
       style="max-width:100%; height:auto;"
     />
-    {{/hasData}}
-    {{^hasData}}
-      <div>No hay datos para las fechas seleccionadas.</div>
-    {{/hasData}}
   </div>
 
   <!-- Gráfico 2: Volumen diario de preguntas -->
   <div class="w3-panel w3-card w3-padding w3-margin-top">
     <h3>Volumen diario de preguntas</h3>
-    {{#hasData}}
     <img
       src="{{chartByDayUrl}}"
       alt="Preguntas por día"
       style="max-width:100%; height:auto;"
     />
-    {{/hasData}}
-    {{^hasData}}
-      <div>No hay datos para las fechas seleccionadas.</div>
-    {{/hasData}}
   </div>
 
 </div>
