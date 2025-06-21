@@ -7,13 +7,6 @@ class AdminModel {
         $this->database = $database;
     }
 
-    /**
-     * Devuelve un array asociativo con el total de preguntas por categoría,
-     * acotado por un rango de fechas opcional.
-     *
-     * @param array $filters ['from' => 'YYYY-MM-DD', 'to' => 'YYYY-MM-DD']
-     * @return array<int,array{category:string,total:int}>
-     */
     public function getQuestionsByCategory(array $filters) {
         // 1) Base de la consulta
         $sql = "
@@ -132,6 +125,29 @@ class AdminModel {
         }
         return $rows;
     }
-    public function getPlayersByDifficulty($difficulty = null) { /* consulta */ }
+
+    public function getCategories(): array {
+        // tu wrapper devuelve ya un array asociativo:
+        $rows = $this->database->query("SELECT id, name FROM categories");
+        // si devuelves siempre un array, basta con devolverlo
+        return $rows;
+    }
+
+    public function getQuestionsByDifficulty(int $categoryId): array
+    {
+        $sql = "
+      SELECT difficulty, COUNT(*) AS total
+        FROM questions
+       WHERE category_id = ?
+       GROUP BY difficulty
+       ORDER BY difficulty
+    ";
+        $stmt = $this->database->prepare($sql);
+        $stmt->bind_param('i', $categoryId);
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+        return $res->fetch_all(MYSQLI_ASSOC);
+    }
 
 }

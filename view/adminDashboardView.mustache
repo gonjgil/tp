@@ -11,6 +11,7 @@
     </button>
   </form>
 
+
   <!-- Gráfico 1: Preguntas por categoría -->
   <div class="w3-panel w3-card w3-padding">
     <h3>Preguntas por Categoría</h3>
@@ -21,11 +22,33 @@
     />
   </div>
 
+<!-- Filtro de categoría para dificultad -->
+  <label class="w3-margin-right">Categoría:
+    <select onchange="
+        window.location.search =
+          'from={{from}}&to={{to}}&category_id=' + this.value
+      ">
+      {{#categories}}
+        <option value="{{id}}" {{#isSelected}}selected{{/isSelected}}>
+          {{name}}
+        </option>
+      {{/categories}}
+    </select>
+  </label>
+
+  <!-- Gráfico 3: dificultad -->
+  <div class="w3-panel w3-card w3-padding w3-margin-top">
+    <h3>Preguntas por Dificultad (categoría seleccionada)</h3>
+    <img src="{{chartDiffUrl}}"
+         alt="Preguntas por dificultad"
+         style="max-width:100%; height:auto;">
+  </div>
+
   <!-- Gráfico 2: Volumen diario de preguntas -->
   <div class="w3-panel w3-card w3-padding w3-margin-top">
     <h3>Volumen diario de preguntas</h3>
     <img
-      src="{{chartByDayUrl}}"
+      src="{{chartDayUrl}}"
       alt="Preguntas por día"
       style="max-width:100%; height:auto;"
     />
