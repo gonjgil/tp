@@ -20,23 +20,20 @@
 <div class="w3-top">
   <div class="w3-bar w3-padding w3-card w3-deep-purple w3-text-white">
         <a href="/" class="logo w3-bar-item w3-button">Código Trivia</a>
-
         {{^user}}
     <div class="w3-right w3-hide-small">
                 <a href="/login" class="w3-bar-item w3-button">Login</a>
                 <a href="/register" class="w3-bar-item w3-button">Registro</a>
             </div>
         {{/user}}
-
         {{#user}}
-
             <div class="w3-bar-item w3-right w3-padding-large">
-                <img src="/{{profile_picture}}?v={{rand}}" alt="Perfil" style="height:40px;width:40px;border-radius:50%;object-fit:cover;">
+                <img src="/{{profile_picture}}?v={{rand}}" alt="Perfil"
+                style="height:40px;width:40px;border-radius:50%;object-fit:cover;border: 2px solid white;">
                 <span class="w3-margin-left">Hola, {{name}}</span>
                 <a href="/login/logout" class="w3-bar-item w3-button w3-padding-large">Cerrar sesión</a>
                 <a href="{{panelUrl}}" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Lobby</a>
                 <a href="/perfilUsuario/show" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Perfil Usuario</a>
-
             </div>
         {{/user}}
     </div>

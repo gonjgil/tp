@@ -1,5 +1,8 @@
 
 <div class="w3-container" style="margin-top:2rem">
+    <br>
+    <br>
+    <br>
     <h3 class="w3-text-purple">Ranking de Jugadores</h3>
     <div class="w3-margin-top">
         <table class="w3-table-all w3-hoverable w3-striped w3-border w3-centered">
@@ -16,17 +19,15 @@
             {{#ranking}}
                 <tr class="w3-hover-light-gray">
                     <td>{{position}}</td>
-
                     <td style="text-align: center;">
                         <a href="/playerProfileRanking/show/{{id}}"
                            class="w3-text-pink w3-hover-text-yellow"
                            style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
                             <img src="/{{profile_picture}}?v={{rand}}" alt="Foto"
-                                 style="width: 36px; height: 36px; object-fit: cover; border-radius: 50%;">
+                            style="width: 36px; height: 36px; object-fit: cover; border-radius: 50%; border: 2px solid black;">
                             <span>{{username}}</span>
                         </a>
                     </td>
-
                     <td>{{accuracy}}%</td>
                     <td>
             <span class="w3-tag {{type_class}}">
@@ -40,6 +41,8 @@
 
         </table>
     </div>
+    <br>
+    <br>
 </div>
 
 

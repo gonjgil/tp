@@ -1,37 +1,40 @@
 <div class="container" style="margin-top: 2rem;">
+    <br><br>
     <h2 class="w3-text-blue">Historial de partidas de {{username}}</h2>
-
-    {{#games}}
-        <table class="w3-table w3-bordered w3-striped">
-            <thead>
-            <tr class="w3-light-grey">
-                <th>ID Partida</th>
-                <th>Correctas</th>
-                <th>Totales</th>
-                <th>Inicio</th>
-                <th>Fin</th>
-            </tr>
-            </thead>
-            <tbody>
-            {{#.}}
-                <tr>
-                    <td>{{id_game}}</td>
-                    <td>{{correct_answers}}</td>
-                    <td>{{total_questions}}</td>
-                    <td>{{start_time}}</td>
-                    <td>{{end_time}}</td>
-                </tr>
-            {{/.}}
-            </tbody>
-        </table>
-    {{/games}}
 
     {{^games}}
         <div class="w3-panel w3-yellow w3-margin-top">
             No se encontraron partidas registradas.
         </div>
     {{/games}}
-</div>
 
+    {{#games}}
+    {{/games}}
+
+    <div style="max-width: 700px; margin: auto;">
+        <table class="w3-table w3-bordered w3-striped w3-card-4 w3-hoverable" style="font-size: 0.9rem;">
+            <thead>
+            <tr style="background-color: #6a00ff; color: white;">
+                <th>N.º de Partida</th>
+                <th>Fecha</th>
+                <th>Puntos Sumados</th>
+                <th>Puntos Totales</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#games}}
+                <tr>
+                    <td>{{number}}</td>
+                    <td>{{start_time}}</td>
+                    <td>{{points}}</td>
+                    <td>{{total}}</td>
+                </tr>
+            {{/games}}
+            </tbody>
+        </table>
+    </div>
+
+    <br>
+</div>
 
 

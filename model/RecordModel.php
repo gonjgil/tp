@@ -8,9 +8,9 @@ class RecordModel {
         $this->database = $database;
     }
 
-    public function getUserGames(int $userId): array {
+    public function getUserGames($userId) {
         $stmt = $this->database->prepare("
-        SELECT id_game, correct_answers, total_questions, start_time, end_time
+        SELECT id_game, correct_answers, start_time
         FROM games
         WHERE user_id = ?
         ORDER BY start_time DESC
@@ -19,7 +19,22 @@ class RecordModel {
         $stmt->execute();
         $result = $stmt->get_result();
 
-        return $result->fetch_all(MYSQLI_ASSOC);
+        $games = [];
+        $totalPoints = 0;
+        $counter = 1;
+
+        while ($row = $result->fetch_assoc()) {
+            $totalPoints += (int)$row['correct_answers'];
+            $games[] = [
+                'number' => $counter++, // partida 1, 2, 3...
+                'start_time' => date("d/m/Y H:i", strtotime($row['start_time'])),
+                'points' => (int)$row['correct_answers'],
+                'total' => $totalPoints
+            ];
+        }
+
+        return $games;
     }
+
 
 }

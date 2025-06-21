@@ -13,19 +13,13 @@ class PerfilUsuarioController
 
     public function show($id = null)
     {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['user'])) {
-            header("Location: /login");
-            exit();
-        }
+        $this->requireLogin();
 
-        if ($id === null) {
-            $id = $_SESSION['user']['id'];
-        }
-
+        $id = $id ?? $_SESSION['user']['id'];
         $user = $this->model->getUserById($id);
+
         if (!$user) {
-            die("User with ID = $id not found.");
+            die("Usuario con ID = $id no encontrado.");
         }
 
         $user['is_own_profile'] = ($_SESSION['user']['id'] == $id);
@@ -34,58 +28,27 @@ class PerfilUsuarioController
 
     public function edit()
     {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['user'])) {
-            header("Location: /login");
-            exit();
-        }
+        $this->requireLogin();
 
         $userId = $_SESSION['user']['id'];
         $user = $this->model->getUserById($userId);
 
         if (!$user) {
-            die("User not found.");
+            die("Usuario no encontrado.");
         }
 
-        $user['gender_male']   = $user['gender'] === 'Masculino';
-        $user['gender_female'] = $user['gender'] === 'Femenino';
-        $user['gender_other']  = $user['gender'] === 'Otro';
-
+        $this->prepareGenderFlags($user);
         $this->view->render('editProfile', $user);
     }
 
     public function save()
     {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['user'])) {
-            header("Location: /login");
-            exit();
-        }
+        $this->requireLogin();
 
         $userId = $_SESSION['user']['id'];
         $data = $_POST;
-        $errors = [];
+        $errors = $this->validatePasswordChange($userId, $data);
 
-        // Validación de contraseña
-        if (!empty($data['current_password']) || !empty($data['new_password']) || !empty($data['repeat_password'])) {
-            $currentPassword = $data['current_password'] ?? '';
-            $newPassword     = $data['new_password'] ?? '';
-            $repeatPassword  = $data['repeat_password'] ?? '';
-
-            $user = $this->model->getUserRawById($userId);
-
-            if ($currentPassword !== $user['password']) {
-                $errors[] = "La contraseña actual es incorrecta.";
-            } elseif ($newPassword !== $repeatPassword) {
-                $errors[] = "Las nuevas contraseñas no coinciden.";
-            } elseif (strlen($newPassword) < 5) {
-                $errors[] = "La nueva contraseña debe tener al menos 5 caracteres.";
-            } else {
-                $data['password'] = $newPassword;
-            }
-        }
-
-        // Subida de imagen
         $filename = $this->handleProfilePicture($_FILES['profile_picture'], $_SESSION['user']['username']);
         if ($filename) {
             $data['profile_picture'] = $filename;
@@ -93,42 +56,58 @@ class PerfilUsuarioController
 
         if (!empty($errors)) {
             $user = $this->model->getUserById($userId);
-            $user['gender_male']   = $user['gender'] === 'Masculino';
-            $user['gender_female'] = $user['gender'] === 'Femenino';
-            $user['gender_other']  = $user['gender'] === 'Otro';
+            $this->prepareGenderFlags($user);
+
             $user['errors'] = $errors;
             $user['lat'] = $data['lat'];
             $user['lng'] = $data['lng'];
             $this->view->render('editProfile', $user);
-            return;
-        }
-
-        $success = $this->model->updateUser($userId, $data);
-
-        if ($success) {
-            //  ACTUALIZAR SESIÓN
-            $updatedUser = $this->model->getUserById($userId);
-            $_SESSION['user']['name'] = $updatedUser['name'];
-            $_SESSION['user']['profile_picture'] = $updatedUser['profile_picture'];
-            $_SESSION['user']['username'] = $updatedUser['username'];
-
+        } else {
+            $this->updateUserAndSession($userId, $data);
             header("Location: /perfilUsuario");
             exit();
-        } else {
-            die("Error al guardar los cambios.");
         }
     }
 
+    // --------------------- metedos invocados -----------------------
 
+    private function requireLogin()
+    {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        if (!isset($_SESSION['user'])) {
+            header("Location: /login");
+            exit();
+        }
+    }
 
+    private function validatePasswordChange($userId, &$data)
+    {
+        $errors = [];
+
+        $current = trim($data['current_password'] ?? '');
+        $new = trim($data['new_password'] ?? '');
+        $repeat = trim($data['repeat_password'] ?? '');
+
+        if ($current || $new || $repeat) {
+            $user = $this->model->getUserRawById($userId);
+
+            if ($current !== $user['password']) {
+                $errors[] = "La contraseña actual es incorrecta.";
+            } elseif ($new !== $repeat) {
+                $errors[] = "Las nuevas contraseñas no coinciden.";
+            } elseif (strlen($new) < 5) {
+                $errors[] = "La nueva contraseña debe tener al menos 5 caracteres.";
+            } else {
+                $data['password'] = $new;
+            }
+        }
+
+        return $errors;
+    }
 
     private function handleProfilePicture($file, $username)
     {
-        if ($file['error'] === UPLOAD_ERR_NO_FILE) {
-            return null;
-        }
-
-        if ($file['error'] !== UPLOAD_ERR_OK) {
+        if ($file['error'] === UPLOAD_ERR_NO_FILE || $file['error'] !== UPLOAD_ERR_OK) {
             return null;
         }
 
@@ -143,12 +122,27 @@ class PerfilUsuarioController
             mkdir($uploadDir, 0777, true);
         }
 
-        if (move_uploaded_file($file['tmp_name'], $fullPath)) {
-            return $fullPath;
-        }
-
-        return null;
+        return move_uploaded_file($file['tmp_name'], $fullPath) ? $fullPath : null;
     }
 
+    private function prepareGenderFlags(&$user)
+    {
+        $user['gender_male'] = $user['gender'] === 'Masculino';
+        $user['gender_female'] = $user['gender'] === 'Femenino';
+        $user['gender_other'] = $user['gender'] === 'Otro';
+    }
 
+    private function updateUserAndSession($userId, $data)
+    {
+        $success = $this->model->updateUser($userId, $data);
+
+        if (!$success) {
+            die("Error al guardar los cambios.");
+        }
+
+        $updatedUser = $this->model->getUserById($userId);
+        $_SESSION['user']['name'] = $updatedUser['name'];
+        $_SESSION['user']['profile_picture'] = $updatedUser['profile_picture'];
+        $_SESSION['user']['username'] = $updatedUser['username'];
+    }
 }

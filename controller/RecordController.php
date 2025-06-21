@@ -22,4 +22,5 @@ class RecordController
             'games' => $games
         ]);
     }
+
 }

@@ -47,10 +47,10 @@ class RankingController
                 $scorePoints = round($scoreNormalized * 1000);
             }
 
-            if ($precision <= 0.25) {
+            if ($precision <= 0.40) {
                 $label = 'Novato';
                 $cssClass = 'w3-win8-green';
-            } elseif ($precision <= 0.69) {
+            } elseif ($precision <= 0.70) {
                 $label = 'Intermedio';
                 $cssClass = 'w3-win8-amber';
             } else {

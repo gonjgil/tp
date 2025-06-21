@@ -1,5 +1,5 @@
 <div class="w3-container w3-margin-top">
-
+    <br>
     <br>
     <br>
     <br>
@@ -13,7 +13,8 @@
 
         <h2 class="w3-text-purple">Perfil de Usuario</h2>
 
-        <div class="w3-container w3-margin-top">
+        <div class="w3-card-4 w3-white w3-round-large w3-padding-large w3-animate-opacity"
+             style="border: 2px solid #6a00ff;">
             <p><strong>Nombre:</strong> {{name}} {{last_name}}</p>
             <p><strong>Fecha de nacimiento:</strong> {{birth_date}}</p>
             <p><strong>Género:</strong> {{gender}}</p>
@@ -29,8 +30,8 @@
                 <a href="/perfilUsuario/edit" class="w3-button w3-purple w3-round-large">Editar Perfil</a>
             </div>
         {{/is_own_profile}}
-
     </div>
+    <br>
 </div>
 
 <script>
