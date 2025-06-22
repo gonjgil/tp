@@ -26,33 +26,70 @@ class AdminController {
         $this->view->render("admin");
     }
 
+//    public function dashboard() {
+//        $today = date('Y-m-d');
+//        $filters = ['from'=>$_GET['from'] ?? $today ,'to'=>$_GET['to'] ?? $today];
+//
+//        //Datos para grafico categorias
+//        $stats   = $this->model->getQuestionsByCategory($filters);
+//        $chartUrl= '/public/graphs/questionsByCategory.php?'.http_build_query($filters);
+//
+//        //Datos para grafico preguntas por dia
+//        $chartDayUrl   = '/public/graphs/questionsByDay.php?' . http_build_query($filters);
+//
+//        //Grafico por categoria
+//        $categories    = $this->model->getCategories();       // [{id,name},…]
+//        $selCat        = $_GET['category_id'] ?? $categories[0]['id'];
+//        $chartDiffUrl  = '/public/graphs/questionsByDifficulty.php?' . http_build_query(['category_id' => $selCat]);
+//
+//        $this->view->render('adminDashboard', [
+//            'from'=>$filters['from'],
+//            'to'=>$filters['to'],
+//            'stats'=>$stats,
+//            'categories'     => array_map(function($c)use($selCat){
+//                $c['isSelected'] = $c['id']==$selCat;
+//                return $c;
+//            }, $categories),
+//            'chartUrl'=>$chartUrl,
+//            'chartDayUrl'   => $chartDayUrl,
+//            'chartDiffUrl'   => $chartDiffUrl,
+//        ]);
+//    }
+
     public function dashboard() {
         $today = date('Y-m-d');
         $filters = ['from'=>$_GET['from'] ?? $today ,'to'=>$_GET['to'] ?? $today];
 
-        //Datos para grafico categorias
+        // grafico categorias
         $stats   = $this->model->getQuestionsByCategory($filters);
         $chartUrl= '/public/graphs/questionsByCategory.php?'.http_build_query($filters);
 
-        //Datos para grafico preguntas por dia
+        // grafico preguntas por dia
         $chartDayUrl   = '/public/graphs/questionsByDay.php?' . http_build_query($filters);
 
-        //Grafico por categoria
-        $categories    = $this->model->getCategories();       // [{id,name},…]
+        $categories    = $this->model->getCategories();
         $selCat        = $_GET['category_id'] ?? $categories[0]['id'];
         $chartDiffUrl  = '/public/graphs/questionsByDifficulty.php?' . http_build_query(['category_id' => $selCat]);
 
+        // filtro
+        $filter = $_GET['filter'] ?? 'gender';
+        $chartPlayersUrl = "/public/graphs/playersSummary.php?" . http_build_query(['filter' => $filter]);
+
         $this->view->render('adminDashboard', [
-            'from'=>$filters['from'],
-            'to'=>$filters['to'],
-            'stats'=>$stats,
-            'categories'     => array_map(function($c)use($selCat){
-                $c['isSelected'] = $c['id']==$selCat;
+            'from'           => $filters['from'],
+            'to'             => $filters['to'],
+            'stats'          => $stats,
+            'categories'     => array_map(function($c) use ($selCat) {
+                $c['isSelected'] = $c['id'] == $selCat;
                 return $c;
             }, $categories),
-            'chartUrl'=>$chartUrl,
-            'chartDayUrl'   => $chartDayUrl,
-            'chartDiffUrl'   => $chartDiffUrl,
+            'chartUrl'        => $chartUrl,
+            'chartDayUrl'     => $chartDayUrl,
+            'chartDiffUrl'    => $chartDiffUrl,
+            'chartPlayersUrl' => $chartPlayersUrl,
+            'filter'          => $filter,
+            'filter_is_gender'  => $filter === 'gender',
+            'filter_is_country' => $filter === 'country',
         ]);
     }
     public function getQuestionsByDifficulty(array $filters) {
@@ -100,70 +137,148 @@ class AdminController {
         }, $res);
     }
 
-    public function exportarPDF() {
-        // 1. Obtener los filtros de la URL
-        $filters = ['from' => $_GET['from'] ?? null, 'to' => $_GET['to'] ?? null];
+//    public function exportarPDF() {
+//        // 1. Obtener los filtros de la URL
+//        $filters = ['from' => $_GET['from'] ?? null, 'to' => $_GET['to'] ?? null];
+//
+//        // 2. Construir las URLs ABSOLUTAS a los gráficos
+//        // Dompdf necesita una URL completa para acceder a las imágenes.
+//        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+//        $host = $_SERVER['HTTP_HOST'];
+//        $queryParams = http_build_query($filters);
+//
+//        $chartUrl = "{$protocol}://{$host}/public/graphs/questionsByCategory.php?{$queryParams}";
+//        $chartDayUrl = "{$protocol}://{$host}/public/graphs/questionsByDay.php?{$queryParams}";
+//
+//        // 3. Crear el contenido HTML para el PDF
+//        // Es un simple string de HTML. Puedes hacerlo tan complejo como quieras.
+//        $html = '
+//            <!DOCTYPE html>
+//            <html>
+//            <head>
+//                <style>
+//                    body { font-family: sans-serif; }
+//                    h1 { text-align: center; color: #333; }
+//                    .chart-container {
+//                        margin-top: 40px;
+//                        page-break-inside: avoid; /* Evita que la imagen se corte entre páginas */
+//                    }
+//                    img { max-width: 100%; height: auto; }
+//                </style>
+//            </head>
+//            <body>
+//                <h1>Reporte de Actividad</h1>
+//                <p><strong>Periodo del:</strong> ' . ($filters['from'] ?? 'Inicio') . ' <strong>al:</strong> ' . ($filters['to'] ?? 'Final') . '</p>
+//
+//                <div class="chart-container">
+//                    <h2>Preguntas por Categoría</h2>
+//                    <img src="' . $chartUrl . '">
+//                </div>
+//
+//                <div class="chart-container">
+//                    <h2>Volumen diario de preguntas</h2>
+//                    <img src="' . $chartDayUrl . '">
+//                </div>
+//            </body>
+//            </html>
+//        ';
+//
+//        // 4. Configurar e instanciar Dompdf
+//        $options = new Options();
+//        // Habilitar 'isRemoteEnabled' es CRUCIAL para que Dompdf pueda cargar imágenes de URLs externas (incluso de tu propio servidor)
+//        $options->set('isRemoteEnabled', true);
+//
+//        $dompdf = new Dompdf($options);
+//
+//        // 5. Cargar el HTML y renderizar el PDF
+//        $dompdf->loadHtml($html);
+//        $dompdf->setPaper('A4', 'portrait'); // (Opcional) Definir tamaño y orientación
+//        $dompdf->render();
+//
+//        // 6. Enviar el PDF al navegador
+//        // El nombre del archivo será "reporte-dashboard-FECHA.pdf"
+//        $dompdf->stream("reporte-dashboard-" . date("Y-m-d") . ".pdf", [
+//            "Attachment" => false // Pone 'true' para forzar la descarga, 'false' para mostrarlo en el navegador.
+//        ]);
+//
+//        exit; // Detenemos la ejecución del script
 
-        // 2. Construir las URLs ABSOLUTAS a los gráficos
-        // Dompdf necesita una URL completa para acceder a las imágenes.
+
+    public function exportarPDF() {
+        $filters = [
+            'from'   => $_GET['from'] ?? null,
+            'to'     => $_GET['to'] ?? null,
+            'filter' => $_GET['filter'] ?? 'gender',
+            'section'=> $_GET['section'] ?? 'all' // NUEVO: indica qué exportar
+        ];
+
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
         $host = $_SERVER['HTTP_HOST'];
-        $queryParams = http_build_query($filters);
+        $queryParams        = http_build_query(['from' => $filters['from'], 'to' => $filters['to']]);
+        $queryParamsPlayers = http_build_query(['filter' => $filters['filter']]);
 
-        $chartUrl = "{$protocol}://{$host}/public/graphs/questionsByCategory.php?{$queryParams}";
-        $chartDayUrl = "{$protocol}://{$host}/public/graphs/questionsByDay.php?{$queryParams}";
+        $chartUrl     = "{$protocol}://{$host}/public/graphs/questionsByCategory.php?{$queryParams}";
+        $chartDayUrl  = "{$protocol}://{$host}/public/graphs/questionsByDay.php?{$queryParams}";
+        $chartPlayers = "{$protocol}://{$host}/public/graphs/playersSummary.php?{$queryParamsPlayers}";
 
-        // 3. Crear el contenido HTML para el PDF
-        // Es un simple string de HTML. Puedes hacerlo tan complejo como quieras.
+        // Armar secciones condicionalmente
+        $htmlSections = [];
+
+        if ($filters['section'] === 'all' || $filters['section'] === 'categories') {
+            $htmlSections[] = '
+            <div class="chart-container">
+                <h2>Preguntas por Categoría</h2>
+                <img src="' . $chartUrl . '">
+            </div>';
+        }
+
+        if ($filters['section'] === 'all' || $filters['section'] === 'daily') {
+            $htmlSections[] = '
+            <div class="chart-container">
+                <h2>Volumen diario de preguntas</h2>
+                <img src="' . $chartDayUrl . '">
+            </div>';
+        }
+
+        if ($filters['section'] === 'all' || $filters['section'] === 'players') {
+            $htmlSections[] = '
+            <div class="chart-container">
+                <h2>Resumen de jugadores por ' . ucfirst($filters['filter']) . '</h2>
+                <img src="' . $chartPlayers . '">
+            </div>';
+        }
+
         $html = '
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body { font-family: sans-serif; }
-                    h1 { text-align: center; color: #333; }
-                    .chart-container { 
-                        margin-top: 40px; 
-                        page-break-inside: avoid; /* Evita que la imagen se corte entre páginas */
-                    }
-                    img { max-width: 100%; height: auto; }
-                </style>
-            </head>
-            <body>
-                <h1>Reporte de Actividad</h1>
-                <p><strong>Periodo del:</strong> ' . ($filters['from'] ?? 'Inicio') . ' <strong>al:</strong> ' . ($filters['to'] ?? 'Final') . '</p>
-                
-                <div class="chart-container">
-                    <h2>Preguntas por Categoría</h2>
-                    <img src="' . $chartUrl . '">
-                </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: sans-serif; }
+                h1 { text-align: center; color: #333; }
+                .chart-container { margin-top: 40px; page-break-inside: avoid; }
+                img { max-width: 100%; height: auto; }
+            </style>
+        </head>
+        <body>
+            <h1>Reporte de Actividad</h1>
+            <p><strong>Periodo del:</strong> ' . ($filters['from'] ?? 'Inicio') . ' <strong>al:</strong> ' . ($filters['to'] ?? 'Final') . '</p>
+            ' . implode('', $htmlSections) . '
+        </body>
+        </html>
+    ';
 
-                <div class="chart-container">
-                    <h2>Volumen diario de preguntas</h2>
-                    <img src="' . $chartDayUrl . '">
-                </div>
-            </body>
-            </html>
-        ';
-
-        // 4. Configurar e instanciar Dompdf
         $options = new Options();
-        // Habilitar 'isRemoteEnabled' es CRUCIAL para que Dompdf pueda cargar imágenes de URLs externas (incluso de tu propio servidor)
         $options->set('isRemoteEnabled', true);
-        
         $dompdf = new Dompdf($options);
-        
-        // 5. Cargar el HTML y renderizar el PDF
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait'); // (Opcional) Definir tamaño y orientación
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        // 6. Enviar el PDF al navegador
-        // El nombre del archivo será "reporte-dashboard-FECHA.pdf"
-        $dompdf->stream("reporte-dashboard-" . date("Y-m-d") . ".pdf", [
-            "Attachment" => false // Pone 'true' para forzar la descarga, 'false' para mostrarlo en el navegador.
-        ]);
-        
-        exit; // Detenemos la ejecución del script
+        $filename = "reporte-" . $filters['section'] . "-" . date("Y-m-d") . ".pdf";
+
+        $dompdf->stream($filename, ["Attachment" => false]);
+        exit;
     }
+
+
 }

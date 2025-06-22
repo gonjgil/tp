@@ -150,4 +150,30 @@ class AdminModel {
         return $res->fetch_all(MYSQLI_ASSOC);
     }
 
+
+
+    //-----------------------///-------------------------------//
+
+
+    public function getPlayersByGender(): array {
+        $sql = "
+        SELECT g.type AS genero, COUNT(u.id) AS total
+        FROM users u
+        JOIN gender g ON u.id_gender = g.id
+        WHERE u.id_rol = 3
+        GROUP BY u.id_gender
+    ";
+        return $this->database->query($sql);
+    }
+
+    public function getPlayersByCountry(): array {
+        $sql = "
+        SELECT u.country AS pais, COUNT(u.id) AS total
+        FROM users u
+        WHERE u.id_rol = 3
+        GROUP BY u.country
+    ";
+        return $this->database->query($sql);
+    }
+
 }

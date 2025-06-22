@@ -1,57 +1,75 @@
 <div class="w3-container" style="margin-top:70px">
-  <h2 class="w3-center">Dashboard de Administración</h2>
+    <h2 class="w3-center">Dashboard de Administración</h2>
 
-  <!-- Filtros -->
-  <form method="get" action="/admin/dashboard" class="w3-margin-bottom">
-    Desde: <input type="date" name="from" value="{{from}}">
-    Hasta: <input type="date" name="to"   value="{{to}}">
-    <button class="w3-button w3-blue">Aplicar</button>
-    <button type="submit" class="w3-button w3-red" formaction="/admin/exportarPDF" formtarget="_blank">
-      Exportar PDF
-    </button>
-  </form>
+    <!-- Filtros de fecha -->
+    <form method="get" action="/admin/dashboard" class="w3-margin-bottom">
+        Desde: <input type="date" name="from" value="{{from}}">
+        Hasta: <input type="date" name="to"   value="{{to}}">
+        <button class="w3-button w3-blue">Aplicar</button>
+    </form>
+
+    <!-- boton de pdf para elejir -->
+    <form method="get" action="/admin/exportarPDF" class="w3-margin-bottom" target="_blank">
+        <input type="hidden" name="from" value="{{from}}">
+        <input type="hidden" name="to" value="{{to}}">
+        <input type="hidden" name="filter" value="{{filter}}">
+
+        <label>Exportar:
+            <select name="section" class="w3-select" style="width:auto; display:inline-block;">
+                <option value="all">Todos los gráficos</option>
+                <option value="categories">Preguntas por Categoría</option>
+                <option value="daily">Volumen Diario</option>
+                <option value="players">Resumen de Jugadores</option>
+            </select>
+        </label>
+
+        <button class="w3-button w3-red">Exportar PDF</button>
+    </form>
+
+    <!-- Gráfico 1: Preguntas por Categoría -->
+    <div class="w3-panel w3-card w3-padding">
+        <h3>Preguntas por Categoría</h3>
+        <img src="{{chartUrl}}" alt="Preguntas por categoría" style="max-width:100%; height:auto;">
+    </div>
+
+    <!-- Filtro de categoría para dificultad -->
+    <label class="w3-margin-right">Categoría:
+        <select onchange="window.location.search = 'from={{from}}&to={{to}}&category_id=' + this.value">
+        {{#categories}}
+            <option value="{{id}}" {{#isSelected}}selected{{/isSelected}}>
+                {{name}}
+            </option>
+        {{/categories}}
+        </select>
+    </label>
+
+    <!-- Gráfico 2: Preguntas por dificultad -->
+    <div class="w3-panel w3-card w3-padding w3-margin-top">
+        <h3>Preguntas por Dificultad (categoría seleccionada)</h3>
+        <img src="{{chartDiffUrl}}" alt="Preguntas por dificultad" style="max-width:100%; height:auto;">
+    </div>
+
+    <!-- Gráfico 3: Volumen diario -->
+    <div class="w3-panel w3-card w3-padding w3-margin-top">
+        <h3>Volumen diario de preguntas</h3>
+        <img src="{{chartDayUrl}}" alt="Preguntas por día" style="max-width:100%; height:auto;">
+    </div>
+
+    <!-- filtro jugadores -->
+    <form method="get" action="/admin/dashboard" class="w3-margin-top w3-margin-bottom">
+        <label for="filter">Resumen de jugadores por:</label>
+        <select name="filter" id="filter" class="w3-select" style="width:auto; display:inline-block;" onchange="this.form.submit()">
+            <option value="gender" {{#filter_is_gender}}selected{{/filter_is_gender}}>Género</option>
+            <option value="country" {{#filter_is_country}}selected{{/filter_is_country}}>País</option>
+        </select>
+        <input type="hidden" name="from" value="{{from}}">
+        <input type="hidden" name="to" value="{{to}}">
+    </form>
 
 
-  <!-- Gráfico 1: Preguntas por categoría -->
-  <div class="w3-panel w3-card w3-padding">
-    <h3>Preguntas por Categoría</h3>
-    <img
-      src="{{chartUrl}}"
-      alt="Preguntas por categoría"
-      style="max-width:100%; height:auto;"
-    />
-  </div>
-
-<!-- Filtro de categoría para dificultad -->
-  <label class="w3-margin-right">Categoría:
-    <select onchange="
-        window.location.search =
-          'from={{from}}&to={{to}}&category_id=' + this.value
-      ">
-      {{#categories}}
-        <option value="{{id}}" {{#isSelected}}selected{{/isSelected}}>
-          {{name}}
-        </option>
-      {{/categories}}
-    </select>
-  </label>
-
-  <!-- Gráfico 3: dificultad -->
-  <div class="w3-panel w3-card w3-padding w3-margin-top">
-    <h3>Preguntas por Dificultad (categoría seleccionada)</h3>
-    <img src="{{chartDiffUrl}}"
-         alt="Preguntas por dificultad"
-         style="max-width:100%; height:auto;">
-  </div>
-
-  <!-- Gráfico 2: Volumen diario de preguntas -->
-  <div class="w3-panel w3-card w3-padding w3-margin-top">
-    <h3>Volumen diario de preguntas</h3>
-    <img
-      src="{{chartDayUrl}}"
-      alt="Preguntas por día"
-      style="max-width:100%; height:auto;"
-    />
-  </div>
-
+    <!-- jugadores por filtro -->
+    <div class="w3-panel w3-card w3-padding w3-margin-top">
+        <h3>Resumen de Jugadores por {{filter}}</h3>
+        <img src="{{chartPlayersUrl}}" alt="Gráfico de jugadores" style="max-width:100%; height:auto;">
+    </div>
 </div>
