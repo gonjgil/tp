@@ -26,10 +26,23 @@ $catId = isset($_GET['category_id'])
 
 // 5) Datos
 $data   = $model->getQuestionsByDifficulty($catId);
-$labels = array_column($data,'difficulty');
-$values = array_map('intval', array_column($data,'total'));
 
-$ticks = array_map(function(int $d): string {
+if (empty($data)) {
+    $im = imagecreate(400, 100);
+    $bg = imagecolorallocate($im, 255, 255, 255);
+    $textcolor = imagecolorallocate($im, 255, 0, 0);
+    imagestring($im, 5, 10, 45, 'No hay datos para esta categoría', $textcolor);
+    header('Content-Type: image/png');
+    imagepng($im);
+    imagedestroy($im);
+    exit;
+}
+
+$labels = array_column($data,'difficulty');
+$values = array_column($data,'total');
+
+$ticks = array_map(function($d) {
+    $d = (float)$d;
     if ($d <= 20)  return 'Muy fácil';
     if ($d <= 40)  return 'Fácil';
     if ($d <= 60)  return 'Media';

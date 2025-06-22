@@ -70,11 +70,10 @@ class AdminController {
         $categories    = $this->model->getCategories();
         $selCat        = $_GET['category_id'] ?? $categories[0]['id'];
         $chartDiffUrl  = '/public/graphs/questionsByDifficulty.php?' . http_build_query(['category_id' => $selCat]);
-
+        
         // filtro
         $filter = $_GET['filter'] ?? 'gender';
         $chartPlayersUrl = "/public/graphs/playersSummary.php?" . http_build_query(['filter' => $filter]);
-
         $this->view->render('adminDashboard', [
             'from'           => $filters['from'],
             'to'             => $filters['to'],
@@ -92,50 +91,73 @@ class AdminController {
             'filter_is_country' => $filter === 'country',
         ]);
     }
-    public function getQuestionsByDifficulty(array $filters) {
-        $sql = "
-      SELECT
-        CASE
-          WHEN q.difficulty < 34 THEN 'Fácil'
-          WHEN q.difficulty < 67 THEN 'Medio'
-          ELSE 'Difícil'
-        END AS nivel,
-        COUNT(*) AS total
-      FROM questions q
-    ";
-        $params = []; $conds = [];
 
-        // Filtro por categoria
-        if (! empty($filters['category_id'])) {
-            $conds[]   = "q.category_id = ?";
-            $params[]  = $filters['category_id'];
-        }
+    public function getQuestionsByDifficulty($category_id) {
+        $query = "SELECT 
+            difficulty
+            COUNT(*) AS total 
+            FROM questions
+            WHERE category_id = ?
+            GROUP BY difficulty";
 
-        if ($conds) {
-            $sql .= " WHERE " . implode(" AND ", $conds);
-        }
-        $sql .= " GROUP BY nivel ORDER BY 
-        CASE nivel 
-          WHEN 'Fácil' THEN 1 
-          WHEN 'Medio' THEN 2 
-          WHEN 'Difícil' THEN 3 
-        END";
-
-        $stmt = $this->database->prepare($sql);
-        if ($params) {
-            // todos enteros
-            $stmt->bind_param(str_repeat('i', count($params)), ...$params);
-        }
+        $stmt = $this->database->prepare($query);
+        $stmt->bind_param("i", $category_id);
         $stmt->execute();
-        $res = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-        return array_map(function($r){
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        
+        return array_map(function($item) {
             return [
-                'nivel' => $r['nivel'],
-                'total' => (int)$r['total']
+                'difficulty' => (float)$item['difficulty'],
+                'total' => (int)$item['total']
             ];
-        }, $res);
+        }, $result);
     }
+
+    // public function getQuestionsByDifficulty(array $filters) {
+    //     $sql = "
+    //   SELECT
+    //     CASE
+    //       WHEN q.difficulty < 34 THEN 'Fácil'
+    //       WHEN q.difficulty < 67 THEN 'Medio'
+    //       ELSE 'Difícil'
+    //     END AS nivel,
+    //     COUNT(*) AS total
+    //   FROM questions q
+    // ";
+    //     $params = []; $conds = [];
+
+    //     // Filtro por categoria
+    //     if (! empty($filters['category_id'])) {
+    //         $conds[]   = "q.category_id = ?";
+    //         $params[]  = $filters['category_id'];
+    //     }
+
+    //     if ($conds) {
+    //         $sql .= " WHERE " . implode(" AND ", $conds);
+    //     }
+    //     $sql .= " GROUP BY nivel ORDER BY 
+    //     CASE nivel 
+    //       WHEN 'Fácil' THEN 1 
+    //       WHEN 'Medio' THEN 2 
+    //       WHEN 'Difícil' THEN 3 
+    //     END";
+
+    //     $stmt = $this->database->prepare($sql);
+    //     if ($params) {
+    //         // todos enteros
+    //         $stmt->bind_param(str_repeat('i', count($params)), ...$params);
+    //     }
+    //     $stmt->execute();
+    //     $res = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    //     return array_map(function($r){
+    //         return [
+    //             'nivel' => $r['nivel'],
+    //             'total' => (int)$r['total']
+    //         ];
+    //     }, $res);
+    // }
 
 //    public function exportarPDF() {
 //        // 1. Obtener los filtros de la URL
