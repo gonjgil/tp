@@ -7,75 +7,67 @@ class AdminModel {
         $this->database = $database;
     }
 
-    public function getQuestionsByCategory(array $filters) {
-        // 1) Base de la consulta
+    public function getQuestionsByCategory(array $filters): array
+    {
+        $from       = $filters['from']       ?? '1970-01-01';
+        $to         = $filters['to']         ?? date('Y-m-d');
+        $creator_id = $filters['creator_id'] ?? 'all';
+
         $sql = "
-          SELECT c.name   AS category,
-                 COUNT(q.id) AS total
-            FROM categories c
-            LEFT JOIN questions q
-              ON q.category_id = c.id
-        ";
+      SELECT 
+        c.name     AS category,
+        COUNT(q.id) AS total
+      FROM categories c
+      LEFT JOIN questions q
+        ON q.category_id = c.id
+       AND DATE(q.created_at) BETWEEN ? AND ?
+    ";
+        $types  = 'ss';
+        $params = [$from, $to];
 
-        // 2) Construimos cláusulas dinámicas y parámetros
-        $conds  = [];
-        $params = [];
-        $types  = '';
-
-        if (!empty($filters['from'])) {
-            $conds[]  = "q.created_at >= ?";
-            $params[] = $filters['from'];
-            $types   .= 's';
-        }
-        if (!empty($filters['to'])) {
-            $conds[]  = "q.created_at <= ?";
-            $params[] = $filters['to'];
-            $types   .= 's';
-        }
-        if ($conds) {
-            $sql .= ' WHERE ' . implode(' AND ', $conds);
+        if ($creator_id !== 'all') {
+            $sql     .= " AND q.creator_id = ? ";
+            $types    .= 'i';
+            $params[] = $creator_id;
         }
 
-        $sql .= ' GROUP BY c.id, c.name';
+        $sql .= " GROUP BY c.id, c.name";
 
-        // 3) Preparamos y bind de parámetros
         $stmt = $this->database->prepare($sql);
-        if ($types !== '') {
-            // bind_param espera lista de argumentos: tipo, &param1, &param2, …
-            $stmt->bind_param($types, ...$params);
-        }
-
-        // 4) Ejecutamos
+        $stmt->bind_param($types, ...$params);
         $stmt->execute();
 
-        // 5) Intentamos usar get_result()
         if (method_exists($stmt, 'get_result')) {
-            $result = $stmt->get_result();
-            return $result->fetch_all(MYSQLI_ASSOC);
+            return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         }
-
-        // 6) Fallback sin get_result(): bind_result + fetch()
         $stmt->bind_result($category, $total);
         $rows = [];
         while ($stmt->fetch()) {
-            $rows[] = [
-                'category' => $category,
-                'total'    => (int)$total,
-            ];
+            $rows[] = ['category' => $category, 'total' => (int)$total];
         }
         return $rows;
     }
 
+    public function getQuestionCreators(): array
+    {
+        $sql = "
+        SELECT DISTINCT
+            u.id          AS creator_id,
+            u.username    AS username
+          FROM questions q
+          JOIN users     u ON q.creator_id = u.id
+    ";
+        return $this->database->query($sql);
+    }
+
     public function getQuestionsPerDay(array $filters): array
     {
-        // 1) Base de la consulta
         $sql = "
       SELECT DATE(created_at) AS fecha,
              COUNT(id)         AS total
         FROM questions
     ";
 
-        // 2) Condiciones dinámicas
         $conds  = [];
         $params = [];
         $types  = '';
@@ -95,26 +87,20 @@ class AdminModel {
             $sql .= ' WHERE ' . implode(' AND ', $conds);
         }
 
-        // 3) Agrupamos y ordenamos por fecha
         $sql .= ' GROUP BY DATE(created_at) ORDER BY fecha';
 
-        // 4) Preparamos y linkamos parámetros
         $stmt = $this->database->prepare($sql);
         if ($types !== '') {
-            // bind_param necesita tipo + referencias a cada valor
             $stmt->bind_param($types, ...$params);
         }
 
-        // 5) Ejecutamos
         $stmt->execute();
 
-        // 6) Intentamos fetch_all (si tu PHP lo soporta)
         if (method_exists($stmt, 'get_result')) {
             $result = $stmt->get_result();
             return $result->fetch_all(MYSQLI_ASSOC);
         }
 
-        // 7) Fallback para versiones sin get_result()
         $stmt->bind_result($fecha, $total);
         $rows = [];
         while ($stmt->fetch()) {

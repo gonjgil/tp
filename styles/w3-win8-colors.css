@@ -87,6 +87,18 @@
   background-color: #a0522d !important;
 }
 
+
+.w3-row-padding > .w3-half { display: flex; }
+.w3-row-padding > .w3-half > .w3-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.w3-row-padding > .w3-half > .w3-card img {
+  flex: 1;
+  object-fit: contain;
+}
+
 .w3-input, .w3-select {
     background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white for inputs */
 }

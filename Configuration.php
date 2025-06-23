@@ -16,6 +16,7 @@ require_once ("controller/RankingController.php");
 require_once ("controller/PlayerProfileRankingController.php");
 require_once ("controller/CrearPreguntaController.php");
 require_once ("controller/ReportController.php");
+require_once("controller/GraphsController.php");
 
 require_once ("model/LoginModel.php");
 require_once ("model/RegisterModel.php");
@@ -144,6 +145,12 @@ class Configuration
         $model = new CrearPreguntaModel($this->getDatabase());
         $view = $this->getViewer();
         return new CrearPreguntaController($model, $view);
+    }
+    public function getGraphsController()
+    {
+        $view  = $this->getViewer();
+        $model = new AdminModel($this->getDatabase());
+        return new GraphsController($view, $model);
     }
 
 }

@@ -2,7 +2,8 @@
   "public": {
     "login": [],
     "home": [],
-    "register": []
+    "register": [],
+    "graphs": []
   },
   "player": {
     "perfilusuario": [],
