@@ -22,11 +22,13 @@
     <form method="get" action="/admin/exportarPDF" class="w3-margin-bottom" target="_blank">
       <input type="hidden" name="from"   value="{{from}}">
       <input type="hidden" name="to"     value="{{to}}">
-      <input type="hidden" name="filter" value="{{filter}}">
+      <input type="hidden" name="to"     value="{{to}}">
+      <input type="hidden" name="category_id" value="{{selCat}}">
       <label>Exportar:
         <select name="section" class="w3-select" style="width:auto; display:inline-block;">
           <option value="all">Todos los gráficos</option>
           <option value="categories">Preguntas por Creador</option>
+          <option value="difficulty">Preguntas por Dificultad</option>
           <option value="daily">Volumen Diario</option>
           <option value="players">Resumen de Jugadores</option>
         </select>
@@ -86,7 +88,7 @@
         <div class="w3-card w3-padding w3-border w3-round-large w3-center">
           <h3>Volumen Diario de Preguntas</h3>
           <img src="{{chartDayUrl}}"
-               alt="Volumen Diario"
+               alt="Volumen Diario de Preguntas"
                style="width:100%; height:auto; margin-top:16px;">
         </div>
       </div>
@@ -104,7 +106,7 @@
             </select>
           </label>
           <img src="{{chartPlayersUrl}}"
-               alt="Resumen de Jugadores"
+               alt="Resumen de Jugadores por {{filter}}"
                style="width:100%; height:auto; margin-top:16px;">
         </div>
       </div>

@@ -3,181 +3,258 @@
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-class AdminController {
+class AdminController
+{
+  private $view;
+  private $model;
 
-    private $view;
-    private $model;
+  public function __construct($view, $model)
+  {
+    $this->view = $view;
+    $this->model = $model;
+  }
 
-    public function __construct($view, $model)
+  public function index()
+  {
+    $this->panel();
+  }
+
+  public function panel()
+  {
+    // Renderiza la vista sin datos
+    $this->view->render('admin');
+  }
+  public function dashboard()
+  {
+    $defaultFrom = '2025-01-01';
+    $today = date('Y-m-d');
+    $filters = [
+      'from' => $_GET['from'] ?? $defaultFrom,
+      'to' => $_GET['to'] ?? $today,
+      'category_id' => $_GET['category_id'] ?? 'all',
+      'creator_id' => $_GET['creator_id'] ?? 'all',
+    ];
+    $front = '/index.php';
+
+    $creators = $this->model->getQuestionCreators();
+    $selCreatorId = $filters['creator_id'];
+    $creators = array_map(function ($c) use ($selCreatorId) {
+      $c['isSelected'] = (string) $c['creator_id'] === (string) $selCreatorId;
+      return $c;
+    }, $creators);
+    $isSelectedAll = $selCreatorId === 'all';
+
+    // URLs de los graficos
+    //    1) grafico de Categorias
+    $chartUrl =
+      $front .
+      '?controller=graphs' .
+      '&method=questionsByCategory&' .
+      http_build_query($filters);
+
+    //    2) grafico Volumen diario
+    $chartDayUrl =
+      $front .
+      '?controller=graphs' .
+      '&method=questionsByDay&' .
+      http_build_query($filters);
+
+    //    3) grafico Dificultad
+    $categories = $this->model->getCategories();
+    $selCat = $_GET['category_id'] ?? $categories[0]['id'];
+    $chartDiffUrl =
+      $front .
+      '?controller=graphs' .
+      '&method=questionsByDifficulty&' .
+      http_build_query(['category_id' => $selCat]);
+
+    //    4) grafico Resumen Jugadores
+    $filter = $_GET['filter'] ?? 'gender';
+    $chartPlayersUrl =
+      $front .
+      '?controller=graphs' .
+      '&method=playersSummary&' .
+      http_build_query(['filter' => $filter]);
+
+    //  Renderiza la vista con todos los datos
+    $this->view->render('adminDashboard', [
+      // para los selects de fecha
+      'from' => $filters['from'],
+      'to' => $filters['to'],
+
+      // para el dropdown de creadores en el grafico 1
+      'creators' => $creators,
+      'selCat' => $selCat,
+      'isSelectedAll' => $isSelectedAll,
+
+      // dropdown de categorias en el grafico 2
+      'categories' => array_map(function ($c) use ($selCat) {
+        $c['isSelected'] = $c['id'] == $selCat;
+        return $c;
+      }, $categories),
+
+      // dropdown de genero/pais en el grafico 4
+      'filter' => $filter,
+      'filter_is_gender' => $filter === 'gender',
+      'filter_is_country' => $filter === 'country',
+
+      // URLs a cada grafico
+      'chartUrl' => $chartUrl,
+      'chartDiffUrl' => $chartDiffUrl,
+      'chartDayUrl' => $chartDayUrl,
+      'chartPlayersUrl' => $chartPlayersUrl,
+    ]);
+  }
+
+ public function exportarPDF()
     {
-        $this->view  = $view;
-        $this->model = $model;
-    }
-
-    public function index()
-    {
-        $this->panel();
-    }
-
-    public function panel()
-    {
-        // Renderiza la vista sin datos
-        $this->view->render("admin");
-    }
-    public function dashboard() {
         $defaultFrom = '2025-01-01';
         $today = date('Y-m-d');
+
         $filters = [
-            'from'       => $_GET['from']       ?? $defaultFrom,
-            'to'         => $_GET['to']         ?? $today,
-            'creator_id' => $_GET['creator_id'] ?? 'all',
-        ];
-        $front = '/index.php';
-
-        $creators     = $this->model->getQuestionCreators();
-        $selCreatorId = $filters['creator_id'];
-        $creators = array_map(function($c) use ($selCreatorId) {
-            $c['isSelected'] = ((string)$c['creator_id'] === (string)$selCreatorId);
-            return $c;
-        }, $creators);
-        $isSelectedAll = ($selCreatorId === 'all');
-
-        // URLs de los graficos
-        //    1) grafico de Categorias
-        $chartUrl       = $front
-            . '?controller=graphs'
-            . '&method=questionsByCategory&'
-            . http_build_query($filters);
-
-        //    2) grafico Volumen diario
-        $chartDayUrl    = $front
-            . '?controller=graphs'
-            . '&method=questionsByDay&'
-            . http_build_query($filters);
-
-        //    3) grafico Dificultad
-        $categories     = $this->model->getCategories();
-        $selCat         = $_GET['category_id'] ?? $categories[0]['id'];
-        $chartDiffUrl   = $front
-            . '?controller=graphs'
-            . '&method=questionsByDifficulty&'
-            . http_build_query(['category_id' => $selCat]);
-
-        //    4) grafico Resumen Jugadores
-        $filter         = $_GET['filter'] ?? 'gender';
-        $chartPlayersUrl= $front
-            . '?controller=graphs'
-            . '&method=playersSummary&'
-            . http_build_query(['filter' => $filter]);
-
-        //  Renderiza la vista con todos los datos
-        $this->view->render('adminDashboard', [
-            // para los selects de fecha
-            'from'            => $filters['from'],
-            'to'              => $filters['to'],
-
-            // para el dropdown de creadores en el grafico 1
-            'creators'        => $creators,
-            'isSelectedAll'   => $isSelectedAll,
-
-            // dropdown de categorias en el grafico 2
-            'categories'      => array_map(function($c) use($selCat) {
-                $c['isSelected'] = ($c['id'] == $selCat);
-                return $c;
-            }, $categories),
-
-            // dropdown de genero/pais en el grafico 4
-            'filter'          => $filter,
-            'filter_is_gender'=> $filter === 'gender',
-            'filter_is_country'=> $filter === 'country',
-
-            // URLs a cada grafico
-            'chartUrl'        => $chartUrl,
-            'chartDayUrl'     => $chartDayUrl,
-            'chartDiffUrl'    => $chartDiffUrl,
-            'chartPlayersUrl' => $chartPlayersUrl,
-        ]);
-    }
-
-
-
-    public function exportarPDF() {
-        $filters = [
-            'from'    => $_GET['from']   ?? null,
-            'to'      => $_GET['to']     ?? null,
-            'filter'  => $_GET['filter'] ?? 'gender',
-            'section' => $_GET['section']?? 'all'
+            'from'        => $_GET['from']        ?? $defaultFrom,
+            'to'          => $_GET['to']          ?? $today,
+            'filter'      => $_GET['filter']      ?? 'gender',
+            'section'     => $_GET['section']     ?? 'all',
+            'category_id' => $_GET['category_id'] ?? '',
+            'creator_id'  => $_GET['creator_id']  ?? 'all',
         ];
 
-        // Host y esquema para URLs absolutas
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS']!=='off') ? 'https' : 'http';
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host   = $_SERVER['HTTP_HOST'];
+        $base   = "{$scheme}://{$host}";
 
-        // Query strings
-        $qsDates   = http_build_query(['from'=>$filters['from'],'to'=>$filters['to']]);
-        $qsCatId   = http_build_query(['category_id'=> $_GET['category_id'] ?? '']);
-        $qsFilter  = http_build_query(['filter'=>$filters['filter']]);
-        // Nuevas rutas MVC (sin .php)
-        $base      = "{$scheme}://{$host}";
-        $chartUrl      = "{$base}/graphs/questionsByCategory?{$qsDates}";
-        $chartDayUrl   = "{$base}/graphs/questionsByDay?{$qsDates}";
-        $chartDiffUrl  = "{$base}/graphs/questionsByDifficulty?{$qsCatId}";
-        $chartPlayers  = "{$base}/graphs/playersSummary?{$qsFilter}";
+        $qsCatChart = http_build_query([
+            'from'       => $filters['from'],
+            'to'         => $filters['to'],
+            'creator_id' => $filters['creator_id'],
+        ]);
+        $chartUrl      = "{$base}/graphs/questionsByCategory?{$qsCatChart}";
+
+        $qsDayChart = http_build_query([
+            'from' => $filters['from'],
+            'to'   => $filters['to'],
+        ]);
+        $chartDayUrl   = "{$base}/graphs/questionsByDay?{$qsDayChart}";
+
+        $qsDiffChart = http_build_query([
+            'category_id' => $filters['category_id'],
+        ]);
+        $chartDiffUrl  = "{$base}/graphs/questionsByDifficulty?{$qsDiffChart}";
+
+        $qsPlayersChart = http_build_query([
+            'filter' => $filters['filter'],
+        ]);
+        $chartPlayers  = "{$base}/graphs/playersSummary?{$qsPlayersChart}";
 
         $htmlSections = [];
 
-        if ($filters['section']==='all' || $filters['section']==='categories') {
-            $htmlSections[] = "
-        <div class=\"chart-container\">
-          <h2>Preguntas por Categoría</h2>
-          <img src=\"{$chartUrl}\" alt=\"Preguntas por Categoría\">
-        </div>";
-        }
-        if ($filters['section']==='all' || $filters['section']==='daily') {
-            $htmlSections[] = "
-        <div class=\"chart-container\">
-          <h2>Volumen diario de preguntas</h2>
-          <img src=\"{$chartDayUrl}\" alt=\"Volumen diario\">
-        </div>";
-        }
-        if ($filters['section']==='all' || $filters['section']==='daily') {
-            // Aseguramos pasar también category_id en la sección diaria si aplica
-            // Si quieres incluir dificultad aquí, cámbialo a section==='difficulty'
-        }
-        if ($filters['section']==='all' || $filters['section']==='players') {
-            $htmlSections[] = "
-        <div class=\"chart-container\">
-          <h2>Resumen de Jugadores por " . ucfirst($filters['filter']) . "</h2>
-          <img src=\"{$chartPlayers}\" alt=\"Resumen de Jugadores\">
-        </div>";
+        $selectedCategoryName = '';
+        if (!empty($filters['category_id'])) {
+            $categories = $this->model->getCategories();
+            foreach ($categories as $cat) {
+                if ((string)$cat['id'] === (string)$filters['category_id']) {
+                    $selectedCategoryName = htmlspecialchars($cat['name']);
+                    break;
+                }
+            }
+            if ($selectedCategoryName === '' && $filters['category_id'] !== '') {
+                $selectedCategoryName = 'ID ' . htmlspecialchars($filters['category_id']) . ' (no encontrada)';
+            }
+        } else {
+            $selectedCategoryName = 'Todas';
         }
 
-        $html = "
-    <!DOCTYPE html>
-    <html>
-    <head><style>
-      body{font-family:sans-serif;}
-      .chart-container{page-break-inside:avoid; margin-top:30px;}
-      img{max-width:100%;height:auto;}
-    </style></head>
-    <body>
-      <h1>Reporte de Actividad</h1>
-      <p><strong>Periodo:</strong> " . ($filters['from']??'Inicio') .
-            " <strong>al:</strong> " . ($filters['to']??'Final') . "</p>
-      " . implode("\n", $htmlSections) . "
-    </body>
-    </html>";
+
+        if ($filters['section'] === 'all' || $filters['section'] === 'categories') {
+            $htmlSections[] = "
+                <div class=\"chart-container\">
+                  <h2>Preguntas por Creador</h2>
+                  <img src=\"{$chartUrl}\" alt=\"Preguntas por Creador\" class=\"chart-img\">
+                </div>";
+        }
+        if ($filters['section'] === 'all' || $filters['section'] === 'difficulty') {
+            $htmlSections[] = "
+                <div class=\"chart-container\">
+                  <h2>Preguntas por Dificultad (Categoría: {$selectedCategoryName})</h2>
+                  <img src=\"{$chartDiffUrl}\" alt=\"Preguntas por Dificultad\" class=\"chart-img\">
+                </div>";
+        }
+        if ($filters['section'] === 'all' || $filters['section'] === 'daily') {
+            $htmlSections[] = "
+                <div class=\"chart-container\">
+                  <h2>Volumen Diario de Preguntas</h2>
+                  <img src=\"{$chartDayUrl}\" alt=\"Volumen diario\" class=\"chart-img\">
+                </div>";
+        }
+        if ($filters['section'] === 'all' || $filters['section'] === 'players') {
+            $htmlSections[] = "
+                <div class=\"chart-container\">
+                  <h2>Resumen de Jugadores por " .
+                ucfirst($filters['filter']) .
+                "</h2>
+                  <img src=\"{$chartPlayers}\" alt=\"Resumen de Jugadores\" class=\"chart-img\">
+                </div>";
+        }
+
+        $reportDate = date('d/m/Y H:i');
+        $periodFrom = date('d/m/Y', strtotime($filters['from']));
+        $periodTo   = date('d/m/Y', strtotime($filters['to']));
+        $sectionExported =
+            isset($filters['section']) && $filters['section'] !== 'all'
+                ? ucfirst($filters['section'])
+                : 'Todos los gráficos';
+
+        $logoUrl = "{$base}/uploads/logo.svg";
+
+        $templatePath = __DIR__ . '/../view/reports/template.html';
+
+        if (!file_exists($templatePath)) {
+            die('Error: PDF template file not found at ' . $templatePath);
+        }
+        $htmlTemplate = file_get_contents($templatePath);
+
+        $replacements = [
+            '{{reportDate}}'           => $reportDate,
+            '{{periodFrom}}'           => $periodFrom,
+            '{{periodTo}}'             => $periodTo,
+            '{{sectionExported}}'      => $sectionExported,
+            '{{htmlSections}}'         => implode("\n", $htmlSections),
+            '{{currentYear}}'          => date('Y'),
+            '{{logoUrl}}'              => $logoUrl,
+        ];
+
+        $html = str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $htmlTemplate
+        );
 
         $options = new Options();
         $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'Helvetica');
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4','portrait');
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->stream("reporte-{$filters['section']}-".date('Y-m-d').".pdf",
-            ['Attachment'=>false]);
-        exit;
+
+        $canvas = $dompdf->getCanvas();
+        $font = $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+        $text = 'Página {PAGE_NUM} de {PAGE_COUNT}';
+        $width = $dompdf->getFontMetrics()->get_text_width($text, $font, 8);
+        $canvas->page_text(
+            590 - $width,
+            810,
+            $text,
+            $font,
+            8,
+            [0, 0, 0]
+        );
+
+        $dompdf->stream(
+            "reporte-{$filters['section']}-" . date('Y-m-d') . '.pdf',
+            ['Attachment' => false]
+        );
+        exit();
     }
-
-
 }

@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Reporte de Actividad del Administrador</title>
+    <style>
+      @page {
+        margin: 70px 40px 60px 40px;
+      }
+
+      body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        margin: 0;
+        margin-top: 10px;
+        color: #333;
+        line-height: 1.6;
+        font-size: 11pt;
+      }
+
+      .first-page-header {
+        position: relative;
+        width: 100%;
+        padding: 10px 0;
+        margin-top: -60px;
+      }
+
+      .header-content-first-page {
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-start;
+        padding: 0 10px;
+      }
+
+      .header-logo {
+        width: 100px;
+        height: auto;
+        margin-right: 10px;
+        vertical-align: middle;
+        line-height: 0;
+      }
+
+      footer {
+        position: fixed;
+        bottom: -40px;
+        left: 0px;
+        right: 0px;
+        height: 30px;
+        text-align: center;
+        border-top: 1px solid #eee;
+        padding-top: 5px;
+        font-size: 9pt;
+        color: #777;
+      }
+
+      h1 {
+        font-size: 24pt;
+        color: #2c3e50;
+        text-align: center;
+        margin-top: -40px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #3498db;
+      }
+
+      h2 {
+        font-size: 16pt;
+        color: #34495e;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        text-align: center;
+        padding-bottom: 5px;
+        border-bottom: 1px dotted #ccc;
+      }
+
+      .report-info {
+        background-color: #f8f8f8;
+        padding: 15px 20px;
+        border-left: 5px solid #3498db;
+        margin-bottom: 30px;
+        font-size: 10pt;
+        color: #444;
+        border-radius: 4px;
+      }
+      .report-info p {
+        margin: 15px 0;
+      }
+
+      .chart-container {
+        page-break-inside: avoid;
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .chart-img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 15px auto 0 auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        background-color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="first-page-header">
+      <div class="header-content-first-page">
+        <img src="{{logoUrl}}" alt="Logo" class="header-logo" />
+      </div>
+    </div>
+
+    <h1>Reporte Generado el {{reportDate}}</h1>
+
+    <div class="report-info">
+      <p>
+        <strong>Periodo Analizado:</strong> Desde {{periodFrom}} hasta
+        {{periodTo}}
+      </p>
+      <p><strong>Sección Exportada:</strong> {{sectionExported}}</p>
+    </div>
+
+    {{htmlSections}}
+  </body>
+</html>

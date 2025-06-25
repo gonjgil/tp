@@ -4,5 +4,5 @@ pendientes.txt
 screenshots/
 package.json
 package-lock.json
-.prettierrc.js
+.prettierrc.json
 node_modules/
