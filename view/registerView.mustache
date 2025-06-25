@@ -49,7 +49,11 @@
                     </div>
                 </div>
 
-                <input class="w3-input w3-border w3-margin-bottom w3-round-large" type="email" name="email" placeholder="Email" required>
+                <input class="w3-input w3-border w3-margin-bottom w3-round-large"
+                       type="email" name="email" id="email" placeholder="Email" required>
+                <p id="email-feedback" class="w3-text-white w3-small"></p>
+
+
                 <input class="w3-input w3-border w3-margin-bottom w3-round-large" type="text" name="username" placeholder="Nombre de usuario" required>
                 <input class="w3-input w3-border w3-margin-bottom w3-round-large" type="password" name="password" placeholder="Contraseña" required>
                 <input class="w3-input w3-border w3-margin-bottom w3-round-large" type="password" name="repeat_password" placeholder="Repetir contraseña" required>
@@ -101,5 +105,37 @@
                 e.preventDefault();
             }
         });
+    });
+</script>
+
+<script>
+    document.getElementById('email').addEventListener('input', function () {
+        const email = this.value;
+        const feedback = document.getElementById('email-feedback');
+
+        if (email.length < 5 || !email.includes('@')) {
+            feedback.textContent = '';
+            return;
+        }
+
+        fetch('/core/checkEmail.php?email=' + encodeURIComponent(email))
+                .then(res => res.json())
+                .then(data => {
+                    if (data.available) {
+                        feedback.textContent = 'Email disponible';
+                        feedback.style.color = 'white';
+                        feedback.style.backgroundColor = '#4CAF50';
+                        feedback.style.fontWeight = 'bold';
+                        feedback.style.padding = '4px 8px';
+                        feedback.style.borderRadius = '4px';
+                    } else {
+                        feedback.textContent = 'Email no disponible';
+                        feedback.style.color = 'white';
+                        feedback.style.backgroundColor = '#f44336';
+                        feedback.style.fontWeight = 'bold';
+                        feedback.style.padding = '4px 8px';
+                        feedback.style.borderRadius = '4px';
+                    }
+                })
     });
 </script>
