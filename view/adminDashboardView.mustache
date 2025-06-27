@@ -12,27 +12,69 @@
 <div class="main-container" style="margin-top:120px; min-height:calc(100vh - 120px);">
   <div class="w3-container">
 
-    <!-- Filtros globales -->
-    <form method="get" action="/admin/dashboard" class="w3-margin-bottom">
-      Desde: <input type="date" name="from" value="{{from}}">
-      Hasta: <input type="date" name="to"   value="{{to}}">
-      <button class="w3-button w3-blue">Aplicar</button>
-    </form>
+    <!-- FILTROS GLOBALES -->
+    <div class="w3-row-padding w3-margin-bottom">
 
-    <form method="get" action="/admin/exportarPDF" class="w3-margin-bottom" target="_blank">
-      <input type="hidden" name="from"   value="{{from}}">
-      <input type="hidden" name="to"     value="{{to}}">
-      <input type="hidden" name="filter" value="{{filter}}">
-      <label>Exportar:
-        <select name="section" class="w3-select" style="width:auto; display:inline-block;">
-          <option value="all">Todos los gráficos</option>
-          <option value="categories">Preguntas por Creador</option>
-          <option value="daily">Volumen Diario</option>
-          <option value="players">Resumen de Jugadores</option>
-        </select>
-      </label>
-      <button class="w3-button w3-red">Exportar PDF</button>
-    </form>
+      <form action="/admin/dashboard" method="get"
+            class="w3-col s12 m6 w3-row-padding"
+            style="margin:0">
+
+        <div class="w3-col s12 m5">
+          <label for="from">Desde</label>
+          <input id="from"
+                 class="w3-input w3-border"
+                 type="date"
+                 name="from"
+                 value="{{from}}">
+        </div>
+
+        <div class="w3-col s12 m5">
+          <label for="to">Hasta</label>
+          <input id="to"
+                 class="w3-input w3-border"
+                 type="date"
+                 name="to"
+                 value="{{to}}">
+        </div>
+
+        <div class="w3-col s12 m2" style="padding-top:1.8rem">
+          <button type="submit"
+                  class="w3-button w3-win8-blue w3-round-large w3-block">
+            Aplicar
+          </button>
+        </div>
+      </form>
+
+      <!-- FORMULARIO DE EXPORTACIÓN -->
+      <form action="/admin/exportarPDF" method="get" target="_blank"
+            class="w3-col s12 m6 w3-row-padding"
+            style="margin:0">
+
+        <input type="hidden" name="from"   value="{{from}}">
+        <input type="hidden" name="to"     value="{{to}}">
+        <input type="hidden" name="filter" value="{{filter}}">
+
+        <div class="w3-col s12 m8">
+          <label for="section">Exportar</label>
+          <select id="section"
+                  name="section"
+                  class="w3-select w3-border">
+            <option value="all">Todos los gráficos</option>
+            <option value="categories">Preguntas por Creador</option>
+            <option value="daily">Volumen Diario</option>
+            <option value="players">Resumen de Jugadores</option>
+          </select>
+        </div>
+
+        <div class="w3-col s12 m4" style="padding-top:1.8rem">
+          <button type="submit"
+                  class="w3-button w3-win8-red w3-round-large w3-block">
+            Exportar PDF
+          </button>
+        </div>
+      </form>
+
+    </div>
 
     <!-- PRIMERA FILA -->
     <div class="w3-row-padding">
@@ -56,6 +98,23 @@
           <img src="{{chartUrl}}"
                alt="Preguntas por Creador"
                style="width:100%; height:auto; margin-top:16px;">
+               <!-- TABLA de datos -->
+                     <table class="w3-table w3-striped w3-bordered">
+                       <thead>
+                         <tr>
+                           <th>Categoría</th>
+                           <th>Total</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {{#questionsByCreatorData}}
+                         <tr>
+                           <td>{{category}}</td>
+                           <td>{{total}}</td>
+                         </tr>
+                         {{/questionsByCreatorData}}
+                       </tbody>
+                     </table>
         </div>
       </div>
 
@@ -75,6 +134,23 @@
           <img src="{{chartDiffUrl}}"
                alt="Preguntas por Dificultad"
                style="width:100%; height:auto; margin-top:16px;">
+               <!-- TABLA -->
+                     <table class="w3-table w3-striped w3-bordered">
+                       <thead>
+                         <tr>
+                           <th>Dificultad</th>
+                           <th>Total</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {{#questionsByDifficultyData}}
+                         <tr>
+                           <td>{{difficulty}}</td>
+                           <td>{{total}}</td>
+                         </tr>
+                         {{/questionsByDifficultyData}}
+                       </tbody>
+                     </table>
         </div>
       </div>
     </div>
@@ -88,6 +164,23 @@
           <img src="{{chartDayUrl}}"
                alt="Volumen Diario"
                style="width:100%; height:auto; margin-top:16px;">
+               <!-- TABLA -->
+                     <table class="w3-table w3-striped w3-bordered">
+                       <thead>
+                         <tr>
+                           <th>Fecha</th>
+                           <th>Total</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {{#questionsPerDayData}}
+                         <tr>
+                           <td>{{fecha}}</td>
+                           <td>{{total}}</td>
+                         </tr>
+                         {{/questionsPerDayData}}
+                       </tbody>
+                     </table>
         </div>
       </div>
 
@@ -106,6 +199,23 @@
           <img src="{{chartPlayersUrl}}"
                alt="Resumen de Jugadores"
                style="width:100%; height:auto; margin-top:16px;">
+               <!-- TABLA -->
+                     <table class="w3-table w3-striped w3-bordered">
+                       <thead>
+                         <tr>
+                           <th>{{playersLabel}}</th>
+                           <th>Total</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {{#playersSummaryData}}
+                         <tr>
+                           <td>{{label}}</td>
+                           <td>{{total}}</td>
+                         </tr>
+                         {{/playersSummaryData}}
+                       </tbody>
+                     </table>
         </div>
       </div>
     </div>

@@ -25,79 +25,93 @@ class AdminController {
         $this->view->render("admin");
     }
     public function dashboard() {
-        $defaultFrom = '2025-01-01';
-        $today = date('Y-m-d');
+        $today   = date('Y-m-d');
         $filters = [
-            'from'       => $_GET['from']       ?? $defaultFrom,
-            'to'         => $_GET['to']         ?? $today,
-            'creator_id' => $_GET['creator_id'] ?? 'all',
+            'from' => $_GET['from'] ?? $today,
+            'to'   => $_GET['to']   ?? $today,
         ];
         $front = '/index.php';
 
-        $creators     = $this->model->getQuestionCreators();
-        $selCreatorId = $filters['creator_id'];
-        $creators = array_map(function($c) use ($selCreatorId) {
-            $c['isSelected'] = ((string)$c['creator_id'] === (string)$selCreatorId);
-            return $c;
-        }, $creators);
-        $isSelectedAll = ($selCreatorId === 'all');
-
-        // URLs de los graficos
-        //    1) grafico de Categorias
-        $chartUrl       = $front
+        // preguntas por Creador
+        $questionsByCreatorData = $this->model->getQuestionsByCategory($filters);
+        $chartUrl = $front
             . '?controller=graphs'
             . '&method=questionsByCategory&'
-            . http_build_query($filters);
+            . http_build_query($filters + ['creator_id' => $_GET['creator_id'] ?? 'all']);
 
-        //    2) grafico Volumen diario
-        $chartDayUrl    = $front
+        // preguntas por Día (line/step) — usa rango from/to
+        $questionsPerDayData = $this->model->getQuestionsPerDay($filters);
+        $chartDayUrl = $front
             . '?controller=graphs'
             . '&method=questionsByDay&'
             . http_build_query($filters);
 
-        //    3) grafico Dificultad
-        $categories     = $this->model->getCategories();
-        $selCat         = $_GET['category_id'] ?? $categories[0]['id'];
-        $chartDiffUrl   = $front
+        //preguntas por Dificultad
+
+        $categories = $this->model->getCategories();
+        $selCat     = $_GET['category_id'] ?? $categories[0]['id'];
+        $questionsByDifficultyData = $this->model->getQuestionsByDifficulty((int)$selCat);
+        $chartDiffUrl = $front
             . '?controller=graphs'
             . '&method=questionsByDifficulty&'
             . http_build_query(['category_id' => $selCat]);
 
-        //    4) grafico Resumen Jugadores
-        $filter         = $_GET['filter'] ?? 'gender';
-        $chartPlayersUrl= $front
+
+        // resumen de jugador
+        $filter = $_GET['filter'] ?? 'gender';
+        if ($filter === 'country') {
+            $rawPlayers = $this->model->getPlayersByCountry();
+            $playersLabel = 'País';
+            $playersSummaryData = array_map(fn($r) => [
+                'label' => $r['pais'],
+                'total' => $r['total']
+            ], $rawPlayers);
+        } else {
+            $rawPlayers = $this->model->getPlayersByGender();
+            $playersLabel = 'Género';
+            $playersSummaryData = array_map(fn($r) => [
+                'label' => $r['genero'],
+                'total' => $r['total']
+            ], $rawPlayers);
+        }
+        $chartPlayersUrl = $front
             . '?controller=graphs'
             . '&method=playersSummary&'
             . http_build_query(['filter' => $filter]);
 
-        //  Renderiza la vista con todos los datos
+        // render:
         $this->view->render('adminDashboard', [
-            // para los selects de fecha
-            'from'            => $filters['from'],
-            'to'              => $filters['to'],
+            'from'    => $filters['from'],
+            'to'      => $filters['to'],
 
-            // para el dropdown de creadores en el grafico 1
-            'creators'        => $creators,
-            'isSelectedAll'   => $isSelectedAll,
+            // ** datos en crudo para tablas **
+            'questionsByCreatorData'    => $questionsByCreatorData,
+            'questionsPerDayData'       => $questionsPerDayData,
+            'questionsByDifficultyData' => $questionsByDifficultyData,
+            'playersSummaryData'        => $playersSummaryData,
+            'playersLabel'              => $playersLabel,
 
-            // dropdown de categorias en el grafico 2
-            'categories'      => array_map(function($c) use($selCat) {
-                $c['isSelected'] = ($c['id'] == $selCat);
-                return $c;
-            }, $categories),
+            // ** URLs de los gráficos **
+            'chartUrl'       => $chartUrl,
+            'chartDayUrl'    => $chartDayUrl,
+            'chartDiffUrl'   => $chartDiffUrl,
+            'chartPlayersUrl'=> $chartPlayersUrl,
 
-            // dropdown de genero/pais en el grafico 4
-            'filter'          => $filter,
-            'filter_is_gender'=> $filter === 'gender',
-            'filter_is_country'=> $filter === 'country',
-
-            // URLs a cada grafico
-            'chartUrl'        => $chartUrl,
-            'chartDayUrl'     => $chartDayUrl,
-            'chartDiffUrl'    => $chartDiffUrl,
-            'chartPlayersUrl' => $chartPlayersUrl,
+            // ** selectores existentes **
+            'categories'           => array_map(fn($c) => [
+                'id'=>$c['id'],
+                'name'=>$c['name'],
+                'isSelected'=>$c['id']==$selCat
+            ], $categories),
+            'filter'               => $filter,
+            'filter_is_gender'     => $filter==='gender',
+            'filter_is_country'    => $filter==='country',
+            'creators'             => $this->model->getQuestionCreators(), // debe devolver id/username
+            'isAllSelectedCreator' => ($_GET['creator_id'] ?? 'all')==='all',
+            'selectedCreatorId'    => $_GET['creator_id'] ?? 'all',
         ]);
     }
+
 
 
 
