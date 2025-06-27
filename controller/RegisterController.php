@@ -1,5 +1,5 @@
 <?php
-require_once 'core/emailSender.php';
+require_once 'api/emailSender.php';
 
 class RegisterController{
 

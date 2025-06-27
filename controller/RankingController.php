@@ -17,14 +17,15 @@ class RankingController
         $this->showRanking();
     }
 
+
+
     public function showRanking()
     {
-
         $data = $this->model->getRanking();
 
         $rawRows = $data['rows'];
-        $maxGames = $data['maxGames'] ?: 1; // evita el 0
-        $maxDifficulty = $data['maxDifficulty'] ?: 1;
+        $maxGames = $data['maxGames'] ?: 1;
+        $maxTotalAnswers = $data['maxTotalAnswers'] ?: 1;
 
         $rankingData = [];
 
@@ -32,20 +33,14 @@ class RankingController
             $total = (int)$row['total_answers'];
             $correct = (int)$row['correct_answers'];
             $gamesPlayed = (int)$row['games_played'];
-            $difficulty = (float)$row['difficulty'];
 
             $precision = $total > 0 ? ($correct / $total) : 0;
             $gamesNormalized = $gamesPlayed / $maxGames;
-            $difficultyNormalized = $difficulty / $maxDifficulty;
+            $answersNormalized = $total / $maxTotalAnswers;
 
-            if ($gamesPlayed == 0) {
-                $scorePoints = 0;
 
-            } else {
-                $scoreNormalized = 0.5 * $precision + 0.3 * $gamesNormalized + 0.2 * $difficultyNormalized;
-
-                $scorePoints = round($scoreNormalized * 1000);
-            }
+            $scoreNormalized = 0.5 * $precision + 0.3 * $gamesNormalized + 0.2 * $answersNormalized;
+            $scorePoints = round($scoreNormalized * 1000);
 
             if ($precision <= 0.40) {
                 $label = 'Novato';
@@ -72,11 +67,12 @@ class RankingController
             ];
         }
 
-        // orden
+        // Ordenar por score
         usort($rankingData, function($a, $b) {
             return $b['score'] <=> $a['score'];
         });
 
+        // Asignar posiciones
         $position = 1;
         foreach ($rankingData as &$item) {
             $item['position'] = $position++;

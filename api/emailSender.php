@@ -3,8 +3,8 @@ require_once 'vendor/PHPMailer/src/PHPMailer.php';
 require_once 'vendor/PHPMailer/src/SMTP.php';
 require_once 'vendor/PHPMailer/src/Exception.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class emailSender
 {

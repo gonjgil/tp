@@ -10,8 +10,8 @@ Options -Indexes
 
    # Permitir acceso directo a public/, uploads/, styles/ y qr.php
    RewriteRule ^(public|uploads|styles)(/|$) - [L,NC]
-   RewriteRule ^qr\.php$ - [L]
-   RewriteRule ^core/checkEmail\.php$ - [L]
+   RewriteRule ^api/qr\.php$ - [L]
+   RewriteRule ^api/checkEmail\.php$ - [L]
 
 
 
