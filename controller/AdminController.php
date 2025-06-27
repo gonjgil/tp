@@ -26,8 +26,10 @@ class AdminController {
     }
     public function dashboard() {
         $today   = date('Y-m-d');
+        $defaultFrom = '2025-06-01';
+
         $filters = [
-            'from' => $_GET['from'] ?? $today,
+            'from' => $_GET['from'] ?? $defaultFrom,
             'to'   => $_GET['to']   ?? $today,
         ];
         $front = '/index.php';
