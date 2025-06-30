@@ -67,12 +67,12 @@ class RankingController
             ];
         }
 
-        // Ordenar por score
+        // orden
         usort($rankingData, function($a, $b) {
             return $b['score'] <=> $a['score'];
         });
 
-        // Asignar posiciones
+        // posicion
         $position = 1;
         foreach ($rankingData as &$item) {
             $item['position'] = $position++;
