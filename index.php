@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once("Configuration.php");
+require_once 'Configuration.php';
 
-$controller = $_GET["controller"] ?? "home";
-$method = $_GET["method"] ?? "index";
+$controller = $_GET['controller'] ?? 'home';
+$method = $_GET['method'] ?? 'index';
 
 $configuration = new Configuration();
 $router = $configuration->getRouter();
@@ -11,42 +11,51 @@ $router = $configuration->getRouter();
 $jsonString = file_get_contents('configuration/rols.json');
 $rolsConfig = json_decode($jsonString, true);
 
-function checkAccess($controller, $method, $rolsConfig) {
-    $controller = strtolower($controller);
-    $method = strtolower($method);
+function checkAccess($controller, $method, $rolsConfig)
+{
+  $controller = strtolower($controller);
+  $method = strtolower($method);
 
-    if ($controller === 'login') {
+  if ($controller === 'login') {
+    return true;
+  }
+
+  foreach (
+    $rolsConfig['public'] ?? []
+    as $publicController => $methodsAllowed
+  ) {
+    if (strtolower($publicController) === $controller) {
+      if (
+        empty($methodsAllowed) ||
+        in_array($method, array_map('strtolower', $methodsAllowed))
+      ) {
         return true;
+      }
     }
-    
-    foreach ($rolsConfig['public'] ?? [] as $publicController => $methodsAllowed) {
-        if (strtolower($publicController) === $controller) {
-            if (empty($methodsAllowed) || in_array($method, array_map('strtolower', $methodsAllowed))) {
-                return true;
-            }
-        }
-    }
-    
-    if (!isset($_SESSION['user'])) {
-        return false;
-    }
-    
-    $userRole = strtolower($_SESSION['user']['user_type'] ?? '');
+  }
 
-    foreach ($rolsConfig[$userRole] ?? [] as $roleController => $methodsAllowed) {
-        if (strtolower($roleController) === $controller) {
-            if (empty($methodsAllowed) || in_array($method, array_map('strtolower', $methodsAllowed))) {
-                return true;
-            }
-        }
-    }
-
+  if (!isset($_SESSION['user'])) {
+    header('Location: /login');
     return false;
+  }
+
+  $userRole = strtolower($_SESSION['user']['user_type'] ?? '');
+
+  foreach ($rolsConfig[$userRole] ?? [] as $roleController => $methodsAllowed) {
+    if (strtolower($roleController) === $controller) {
+      if (
+        empty($methodsAllowed) ||
+        in_array($method, array_map('strtolower', $methodsAllowed))
+      ) {
+        return true;
+      }
+    }
+  }
+
+  header('Location: /login');
+  exit();
 }
 
-if (!checkAccess($controller, $method, $rolsConfig)) {
-    header("Location: /login");
-    exit();
-}
-
+checkAccess($controller, $method, $rolsConfig);
+    
 $router->go($controller, $method);
