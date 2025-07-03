@@ -63,7 +63,7 @@ class AdminController
         //preguntas por Dificultad
 
         $categories = $this->model->getCategories();
-        $selCat     = $_GET['category_id'] ?? $categories[0]['id'];
+        $selCat     = $_GET['category_id'];
         $questionsByDifficultyData = $this->model->getQuestionsByDifficulty((int)$selCat);
         $chartDiffUrl = $front
             . '?controller=graphs'
@@ -133,6 +133,7 @@ class AdminController
             'creators'             => $this->model->getQuestionCreators(), // debe devolver id/username
             'isAllSelectedCreator' => ($_GET['creator_id'] ?? 'all')==='all',
             'selectedCreatorId'    => $_GET['creator_id'] ?? 'all',
+            'selCat' => $selCat,
         ]);
     }
 
@@ -146,7 +147,7 @@ class AdminController
             'to'          => $_GET['to']          ?? $today,
             'filter'      => $_GET['filter']      ?? 'gender',
             'section'     => $_GET['section']     ?? 'all',
-            'category_id' => $_GET['category_id'] ?? '',
+            'category_id' => $_GET['category_id'] ?? ($this->model->getCategories()[0]['id'] ?? ''),
             'creator_id'  => $_GET['creator_id']  ?? 'all',
         ];
 
