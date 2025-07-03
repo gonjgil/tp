@@ -1,5 +1,5 @@
 <?php
-require_once 'core/emailSender.php';
+require_once 'api/emailSender.php';
 
 class RegisterController{
 
@@ -71,32 +71,24 @@ class RegisterController{
     {
         $errors = [];
 
-        if (!preg_match("/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/", $data['name'])) {
-            $errors[] = 'El nombre solo puede contener letras y espacios';
-        }
+        $validations = [
+            ['condition' => !$this->isValidName($data['name']), 'message' => 'El nombre solo puede contener letras y espacios'],
+            ['condition' => !$this->isValidName($data['last_name']), 'message' => 'El apellido solo puede contener letras y espacios'],
+            ['condition' => $this->isFutureDate($data['birth_date']), 'message' => 'La fecha de nacimiento no puede ser en el futuro'],
+            ['condition' => $data['password'] !== $data['repeat_password'], 'message' => 'Las contraseñas no coinciden'],
+            ['condition' => $this->model->isEmailTaken($data['email']), 'message' => 'El email ya está en uso'],
+            ['condition' => $this->model->isUsernameTaken($data['username']), 'message' => 'El nombre de usuario ya existe'],
+        ];
 
-        if (!preg_match("/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/", $data['last_name'])) {
-            $errors[] = 'El apellido solo puede contener letras y espacios';
-        }
-
-        if (strtotime($data['birth_date']) > time()) {
-            $errors[] = 'La fecha de nacimiento no puede ser en el futuro';
-        }
-
-        if ($data['password'] !== $data['repeat_password']) {
-            $errors[] = 'Las contraseñas no coinciden';
-        }
-
-        if ($this->model->isEmailTaken($data['email'])) {
-            $errors[] = 'El email ya esta en uso';
-        }
-
-        if ($this->model->isUsernameTaken($data['username'])) {
-            $errors[] = 'El nombre de usuario ya existe';
+        foreach ($validations as $validation) {
+            if ($validation['condition']) {
+                $errors[] = $validation['message'];
+            }
         }
 
         return $errors;
     }
+
 
     private function ProfilePictureUpload($file, $username)
     {

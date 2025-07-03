@@ -3,8 +3,8 @@ require_once 'vendor/PHPMailer/src/PHPMailer.php';
 require_once 'vendor/PHPMailer/src/SMTP.php';
 require_once 'vendor/PHPMailer/src/Exception.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class emailSender
 {
@@ -25,7 +25,7 @@ class emailSender
             $mail->addAddress($toEmail);
 
             $mail->isHTML(true);
-            $mail->Subject = 'Verificá tu cuenta de Codigo Trivia para poder jugar';
+            $mail->Subject = 'Verifica tu cuenta de Codigo Trivia para poder jugar';
             $mail->Body = $body;
 
             $mail->send();

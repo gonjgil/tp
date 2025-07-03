@@ -1,22 +1,24 @@
 USE trivia;
 
 /* PREGUNTAS (datos) */
-INSERT INTO questions (id, question_text, category_id, creator_id, approved, reported, difficulty, times_answered, times_incorrect) VALUES
-    (1, 'Cual es la capital de Francia?', 1, 2, 1, 0, 90, 10, 9),
-    (2, 'Que planeta es conocido como planeta rojo?', 2, 2, 1, 0, 30, 10, 3),
-    (3, 'Quien escribio "Romeo y Julieta"?', 1, 3, 1, 0, 60, 10, 6),
-    (4, 'Cual es es simbolo quimico del agua?', 2, 3, 1, 0, 90, 10, 9),
-    (5, 'En que año piso la luna el primer ser humano?', 3, 2, 1, 0, 60, 10, 6),
-    (6, 'Cuál es el idioma más hablado del mundo?', 1, 2, 1, 0, 60, 10, 6),
-    (7, 'Quién pintó la Mona Lisa?', 1, 2, 1, 0, 30, 10, 3),
-    (8, 'Qué órgano del cuerpo humano bombea sangre?', 2, 2, 1, 0, 30, 10, 3),
-    (9, 'Cuál es la fórmula química del dióxido de carbono?', 2, 3, 1, 0, 60, 10, 6),
-    (10, 'Qué científico desarrolló la teoría de la relatividad?', 2, 3, 1, 0, 60, 10, 6),
-    (11, 'En qué año comenzó la Segunda Guerra Mundial?', 3, 2, 1, 0, 90, 10, 9),
-    (12, 'Quién fue el primer presidente de los Estados Unidos?', 3, 3, 1, 0, 60, 10, 6),
-    (13, 'Cuál fue la civilización que construyó las pirámides de Egipto?', 3, 2, 1, 0, 90, 10, 9),
-    (14, 'Cuál es la moneda oficial del Reino Unido?', 1, 3, 1, 0, 60, 10, 6),
-    (15, 'Qué país tiene forma de bota?', 1, 2, 1, 0, 30, 10, 3);
+INSERT INTO questions
+(id, question_text, category_id, creator_id, approved, reported, difficulty, times_answered, times_incorrect, created_at)
+VALUES
+    (1,  'Cual es la capital de Francia?',                                         1, 2, 1, 0, 90, 10, 9, '2025-06-20 10:00:00'),
+    (2,  'Que planeta es conocido como planeta rojo?',                              2, 2, 1, 0, 30, 10, 3, '2025-06-21 10:00:00'),
+    (3,  'Quien escribio "Romeo y Julieta"?',                                        1, 3, 1, 0, 60, 10, 6, '2025-06-21 10:00:00'),
+    (4,  'Cual es es simbolo quimico del agua?',                                     2, 3, 1, 0, 90, 10, 9, '2025-06-21 10:00:00'),
+    (5,  'En que año piso la luna el primer ser humano?',                            3, 2, 1, 0, 60, 10, 6, '2025-06-22 10:00:00'),
+    (6,  'Cuál es el idioma más hablado del mundo?',                                1, 2, 1, 0, 60, 10, 6, '2025-06-22 10:00:00'),
+    (7,  'Quién pintó la Mona Lisa?',                                               1, 2, 1, 0, 30, 10, 3, '2025-06-23 10:00:00'),
+    (8,  'Qué órgano del cuerpo humano bombea sangre?',                              2, 2, 1, 0, 30, 10, 3, '2025-06-24 10:00:00'),
+    (9,  'Cuál es la fórmula química del dióxido de carbono?',                       2, 3, 1, 0, 60, 10, 6, '2025-06-24 10:00:00'),
+    (10, 'Qué científico desarrolló la teoría de la relatividad?',                   2, 3, 1, 0, 60, 10, 6, '2025-06-24 10:00:00'),
+    (11, 'En qué año comenzó la Segunda Guerra Mundial?',                            3, 2, 1, 0, 90, 10, 9, '2025-06-25 10:00:00'),
+    (12, 'Quién fue el primer presidente de los Estados Unidos?',                   3, 3, 1, 0, 60, 10, 6, '2025-06-25 10:00:00'),
+    (13, 'Cuál fue la civilización que construyó las pirámides de Egipto?',          3, 2, 1, 0, 90, 10, 9, '2025-06-25 10:00:00'),
+    (14, 'Cuál es la moneda oficial del Reino Unido?',                               1, 3, 1, 0, 60, 10, 6, '2025-06-25 10:00:00'),
+    (15, 'Qué país tiene forma de bota?',                                           1, 2, 1, 0, 30, 10, 3, '2025-06-25 10:00:00');
 
 /* OPCIONES (datos) */
 INSERT INTO answers (question_id, answer_text, is_correct) VALUES

@@ -36,75 +36,105 @@ class AdminController
     ];
     $front = '/index.php';
 
-    $creators = $this->model->getQuestionCreators();
-    $selCreatorId = $filters['creator_id'];
-    $creators = array_map(function ($c) use ($selCreatorId) {
-      $c['isSelected'] = (string) $c['creator_id'] === (string) $selCreatorId;
-      return $c;
-    }, $creators);
-    $isSelectedAll = $selCreatorId === 'all';
 
-    // URLs de los graficos
-    //    1) grafico de Categorias
-    $chartUrl =
-      $front .
-      '?controller=graphs' .
-      '&method=questionsByCategory&' .
-      http_build_query($filters);
+        $creators     = $this->model->getQuestionCreators();
+        $selCreatorId = $filters['creator_id'];
+        $creators = array_map(function($c) use ($selCreatorId) {
+            $c['isSelected'] = ((string)$c['creator_id'] === (string)$selCreatorId);
+            return $c;
+        }, $creators);
+        $isSelectedAll = ($selCreatorId === 'all');
+        $questionsByCreatorData = $this->model->getQuestionsByCategory($filters);
 
-    //    2) grafico Volumen diario
-    $chartDayUrl =
-      $front .
-      '?controller=graphs' .
-      '&method=questionsByDay&' .
-      http_build_query($filters);
+        // URLs de los graficos
+        //    1) grafico de Categorias
+        $chartUrl       = $front
+            . '?controller=graphs'
+            . '&method=questionsByCategory&'
+            . http_build_query($filters + ['creator_id' => $_GET['creator_id'] ?? 'all']);
 
-    //    3) grafico Dificultad
-    $categories = $this->model->getCategories();
-    $selCat = $_GET['category_id'] ?? $categories[0]['id'];
-    $chartDiffUrl =
-      $front .
-      '?controller=graphs' .
-      '&method=questionsByDifficulty&' .
-      http_build_query(['category_id' => $selCat]);
+        // preguntas por Día (line/step) — usa rango from/to
+        $questionsPerDayData = $this->model->getQuestionsPerDay($filters);
+        $chartDayUrl = $front
+            . '?controller=graphs'
+            . '&method=questionsByDay&'
+            . http_build_query($filters);
 
-    //    4) grafico Resumen Jugadores
-    $filter = $_GET['filter'] ?? 'gender';
-    $chartPlayersUrl =
-      $front .
-      '?controller=graphs' .
-      '&method=playersSummary&' .
-      http_build_query(['filter' => $filter]);
+        //preguntas por Dificultad
 
-    //  Renderiza la vista con todos los datos
-    $this->view->render('adminDashboard', [
-      // para los selects de fecha
-      'from' => $filters['from'],
-      'to' => $filters['to'],
+        $categories = $this->model->getCategories();
+        $selCat     = $_GET['category_id'] ?? $categories[0]['id'];
+        $questionsByDifficultyData = $this->model->getQuestionsByDifficulty((int)$selCat);
+        $chartDiffUrl = $front
+            . '?controller=graphs'
+            . '&method=questionsByDifficulty&'
+            . http_build_query(['category_id' => $selCat]);
 
-      // para el dropdown de creadores en el grafico 1
-      'creators' => $creators,
-      'selCat' => $selCat,
-      'isSelectedAll' => $isSelectedAll,
 
-      // dropdown de categorias en el grafico 2
-      'categories' => array_map(function ($c) use ($selCat) {
-        $c['isSelected'] = $c['id'] == $selCat;
-        return $c;
-      }, $categories),
+        // resumen de jugador
+        $filter = $_GET['filter'] ?? 'gender';
+        if ($filter === 'country') {
+            $rawPlayers = $this->model->getPlayersByCountry();
+            $playersLabel = 'País';
+            $playersSummaryData = array_map(fn($r) => [
+                'label' => $r['pais'],
+                'total' => $r['total']
+            ], $rawPlayers);
+        } else {
+            $rawPlayers = $this->model->getPlayersByGender();
+            $playersLabel = 'Género';
+            $playersSummaryData = array_map(fn($r) => [
+                'label' => $r['genero'],
+                'total' => $r['total']
+            ], $rawPlayers);
+        }
+        $chartPlayersUrl = $front
+            . '?controller=graphs'
+            . '&method=playersSummary&'
+            . http_build_query(['filter' => $filter]);
 
-      // dropdown de genero/pais en el grafico 4
-      'filter' => $filter,
-      'filter_is_gender' => $filter === 'gender',
-      'filter_is_country' => $filter === 'country',
+        // render:
+        $this->view->render('adminDashboard', [
+            'from'    => $filters['from'],
+            'to'      => $filters['to'],
 
-      // URLs a cada grafico
-      'chartUrl' => $chartUrl,
-      'chartDiffUrl' => $chartDiffUrl,
-      'chartDayUrl' => $chartDayUrl,
-      'chartPlayersUrl' => $chartPlayersUrl,
-    ]);
-  }
+            // ** datos en crudo para tablas **
+            'questionsByCreatorData'    => $questionsByCreatorData,
+            'questionsPerDayData'       => $questionsPerDayData,
+            'questionsByDifficultyData' => $questionsByDifficultyData,
+            'playersSummaryData'        => $playersSummaryData,
+            'playersLabel'              => $playersLabel,
+
+            // ** URLs de los gráficos **
+            'chartUrl'       => $chartUrl,
+            'chartDayUrl'    => $chartDayUrl,
+            'chartDiffUrl'   => $chartDiffUrl,
+            'chartPlayersUrl'=> $chartPlayersUrl,
+
+            // dropdown de categorias en el grafico 2
+            // MODIFICADO POR EL DE ABAJO EN EL MERGE
+            // 'categories'      => array_map(function($c) use($selCat) {
+            //     $c['isSelected'] = ($c['id'] == $selCat);
+            //     return $c;
+            // }, $categories),
+
+            // ** selectores existentes **
+            'categories'           => array_map(fn($c) => [
+                'id'=>$c['id'],
+                'name'=>$c['name'],
+                'isSelected'=>$c['id']==$selCat
+                ], $categories),
+
+            // dropdown de genero/pais en el grafico 4
+            'filter'          => $filter,
+            'filter_is_gender'=> $filter === 'gender',
+            'filter_is_country'=> $filter === 'country',
+
+            'creators'             => $this->model->getQuestionCreators(), // debe devolver id/username
+            'isAllSelectedCreator' => ($_GET['creator_id'] ?? 'all')==='all',
+            'selectedCreatorId'    => $_GET['creator_id'] ?? 'all',
+        ]);
+    }
 
  public function exportarPDF()
     {

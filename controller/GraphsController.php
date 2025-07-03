@@ -18,30 +18,25 @@ class GraphsController
 
     public function questionsByCategory()
     {
-        // 1) Leer parametros que llegan de URL
         $from       = $_GET['from']       ?? '1970-01-01';
         $to         = $_GET['to']         ?? date('Y-m-d');
         $creator_id = $_GET['creator_id'] ?? 'all';
 
-        // 2) agrupar en un array
         $filters = [
             'from'       => $from,
             'to'         => $to,
             'creator_id' => $creator_id,
         ];
 
-        // 3) Pedir los datos al modelo
         $data   = $this->model->getQuestionsByCategory($filters);
         $labels = array_column($data, 'category');
         $values = array_map('intval', array_column($data, 'total'));
 
-        // 4) Si no hay nada, dibujamos “no data”
         if (array_sum($values) === 0) {
             $this->renderNoData(700, 200, 'No hay preguntas registradas aún');
             return;
         }
 
-        // 5) Pintamos el grafico
         header('Content-Type: image/png');
         $graph = new PieGraph(700, 400);
         $graph->title->Set('Preguntas por Creador');
@@ -51,32 +46,39 @@ class GraphsController
         $graph->Stroke();
     }
 
-
     public function questionsByDay()
     {
         $from = $_GET['from'] ?? date('Y-m-d');
         $to   = $_GET['to']   ?? date('Y-m-d');
-        $filters = ['from' => $from, 'to' => $to];
+        $filters = ['from'=>$from,'to'=>$to];
 
         $data   = $this->model->getQuestionsPerDay($filters);
-        $labels = array_column($data, 'date');
+        $labels = array_column($data, 'fecha');
         $values = array_map('intval', array_column($data, 'total'));
 
-        if (count($values) < 2) {
-            $this->renderNoData(700, 200, 'Se requieren al menos 2 puntos de datos');
-            return;
-        }
-
         header('Content-Type: image/png');
+
         $graph = new Graph(700, 400);
         $graph->SetScale('textlin');
-        $graph->title->Set('Preguntas por Día');
+        $graph->SetMargin(60,20,40,60);                          // márgenes más amplios
+        $graph->title->Set('Volumen Diario de Preguntas');
+
+        $graph->ygrid->SetFill(true, '#EFEFEF@0.4', '#FFFFFF@0.4');
+        $graph->ygrid->Show();
         $graph->xaxis->SetTickLabels($labels);
         $graph->xaxis->SetLabelAngle(50);
-        $lineplot = new LinePlot($values);
-        $graph->Add($lineplot);
+
+        $line = new LinePlot($values);
+        $line->SetColor('#0077CC');
+        $line->SetWeight(3);
+        $line->mark->SetType(MARK_FILLEDCIRCLE);
+        $line->mark->SetFillColor('#FFFFFF');
+        $line->mark->SetWidth(6);
+
+        $graph->Add($line);
         $graph->Stroke();
     }
+
 
     public function questionsByDifficulty()
     {
