@@ -27,7 +27,7 @@ class LoginController
             return;
         }
 
-        if ($password !== $user['password']) {
+        if (!password_verify($password, $user['password'])) {
             $this->view->render('login', ['error' => "Contraseña incorrecta"]);
             return;
         }

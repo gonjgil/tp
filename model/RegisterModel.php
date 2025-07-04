@@ -54,7 +54,7 @@ class RegisterModel
     ");
 
         $stmt->bind_param(
-            'iissssssssssidd',
+            'iisssssssisssdd',
             $idGender,
             $idRol,
             $email,

@@ -6,3 +6,4 @@ package.json
 package-lock.json
 .prettierrc.json
 node_modules/
+generar_hash.php
