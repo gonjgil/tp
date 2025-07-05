@@ -21,7 +21,6 @@ class AdminController
 
   public function panel()
   {
-    // Renderiza la vista sin datos
     $this->view->render('admin');
   }
   public function dashboard()
@@ -155,6 +154,17 @@ class AdminController
         $host   = $_SERVER['HTTP_HOST'];
         $base   = "{$scheme}://{$host}";
 
+        $qsDates  = http_build_query([
+            'from' => $filters['from'],
+            'to'   => $filters['to'],
+        ]);
+        $qsCatId  = http_build_query([
+            'category_id' => $filters['category_id'],
+        ]);
+        $qsFilter = http_build_query([
+            'filter' => $filters['filter'],
+        ]);
+
         $qsCatChart = http_build_query([
             'from'       => $filters['from'],
             'to'         => $filters['to'],
@@ -178,6 +188,30 @@ class AdminController
         ]);
         $chartPlayers  = "{$base}/graphs/playersSummary?{$qsPlayersChart}";
 
+        $creatorFilters = [
+            'from'       => $filters['from'],
+            'to'         => $filters['to'],
+            'creator_id' => $_GET['creator_id'] ?? 'all'
+        ];
+
+        $creatorData = $this->model->getQuestionsByCategory($creatorFilters);
+
+        $selCat   = $_GET['category_id'] ?? '';
+        $diffData = $this->model->getQuestionsByDifficulty((int)$selCat);
+
+        $dayData = $this->model->getQuestionsPerDay([
+            'from' => $filters['from'],
+            'to'   => $filters['to']
+        ]);
+
+        if ($filters['filter'] === 'country') {
+            $playersData  = $this->model->getPlayersByCountry();
+            $playersLabel = 'País';
+        } else {
+            $playersData  = $this->model->getPlayersByGender();
+            $playersLabel = 'Género';
+        }
+
         $htmlSections = [];
 
         $selectedCategoryName = '';
@@ -197,35 +231,82 @@ class AdminController
         }
 
 
-        if ($filters['section'] === 'all' || $filters['section'] === 'categories') {
+        if ($filters['section']==='all' || $filters['section']==='categories') {
+            $url = "{$base}/graphs/questionsByCategory?{$qsDates}&creator_id=" . ($_GET['creator_id'] ?? 'all');
             $htmlSections[] = "
-                <div class=\"chart-container\">
-                  <h2>Preguntas por Creador</h2>
-                  <img src=\"{$chartUrl}\" alt=\"Preguntas por Creador\" class=\"chart-img\">
-                </div>";
+    <div class=\"chart-container\">
+      <h2>Preguntas por Creador</h2>
+      <img src=\"{$url}\" alt=\"Preguntas por Creador\">
+      <table class=\"w3-table w3-striped w3-bordered\" style=\"width:100%;margin-top:10px;\">
+        <thead><tr><th>Categoría</th><th>Total</th></tr></thead>
+        <tbody>
+    ";
+            foreach ($creatorData as $r) {
+                $htmlSections[] = "<tr><td>{$r['category']}</td><td>{$r['total']}</td></tr>";
+            }
+            $htmlSections[] = "
+        </tbody>
+      </table>
+    </div>";
         }
-        if ($filters['section'] === 'all' || $filters['section'] === 'difficulty') {
+
+
+        if ($filters['section']==='all' || $filters['section']==='difficulty') {
+            $url = "{$base}/graphs/questionsByDifficulty?{$qsCatId}";
             $htmlSections[] = "
-                <div class=\"chart-container\">
-                  <h2>Preguntas por Dificultad (Categoría: {$selectedCategoryName})</h2>
-                  <img src=\"{$chartDiffUrl}\" alt=\"Preguntas por Dificultad\" class=\"chart-img\">
-                </div>";
+    <div class=\"chart-container\">
+      <h2>Preguntas por Dificultad</h2>
+      <img src=\"{$url}\" alt=\"Preguntas por Dificultad\">
+      <table class=\"w3-table w3-striped w3-bordered\" style=\"width:100%;margin-top:10px;\">
+        <thead><tr><th>Dificultad</th><th>Total</th></tr></thead>
+        <tbody>
+    ";
+            foreach ($diffData as $r) {
+                $htmlSections[] = "<tr><td>{$r['difficulty']}</td><td>{$r['total']}</td></tr>";
+            }
+            $htmlSections[] = "
+        </tbody>
+      </table>
+    </div>";
         }
-        if ($filters['section'] === 'all' || $filters['section'] === 'daily') {
+
+        if ($filters['section']==='all' || $filters['section']==='daily') {
+            $url = "{$base}/graphs/questionsByDay?{$qsDates}";
             $htmlSections[] = "
-                <div class=\"chart-container\">
-                  <h2>Volumen Diario de Preguntas</h2>
-                  <img src=\"{$chartDayUrl}\" alt=\"Volumen diario\" class=\"chart-img\">
-                </div>";
+    <div class=\"chart-container\">
+      <h2>Volumen Diario de Preguntas</h2>
+      <img src=\"{$url}\" alt=\"Volumen Diario\">
+      <table class=\"w3-table w3-striped w3-bordered\" style=\"width:100%;margin-top:10px;\">
+        <thead><tr><th>Fecha</th><th>Total</th></tr></thead>
+        <tbody>
+    ";
+            foreach ($dayData as $r) {
+                $htmlSections[] = "<tr><td>{$r['fecha']}</td><td>{$r['total']}</td></tr>";
+            }
+            $htmlSections[] = "
+        </tbody>
+      </table>
+    </div>";
         }
-        if ($filters['section'] === 'all' || $filters['section'] === 'players') {
+
+        if ($filters['section']==='all' || $filters['section']==='players') {
+            $url = "{$base}/graphs/playersSummary?{$qsFilter}";
             $htmlSections[] = "
-                <div class=\"chart-container\">
-                  <h2>Resumen de Jugadores por " .
-                ucfirst($filters['filter']) .
-                "</h2>
-                  <img src=\"{$chartPlayers}\" alt=\"Resumen de Jugadores\" class=\"chart-img\">
-                </div>";
+    <div class=\"chart-container\">
+      <h2>Resumen de Jugadores por {$playersLabel}</h2>
+      <img src=\"{$url}\" alt=\"Resumen de Jugadores\">
+      <table class=\"w3-table w3-striped w3-bordered\" style=\"width:100%;margin-top:10px;\">
+        <thead><tr><th>{$playersLabel}</th><th>Total</th></tr></thead>
+        <tbody>
+    ";
+            foreach ($playersData as $r) {
+                $label = $filters['filter'] === 'country' ? $r['pais'] : $r['genero'];
+                $htmlSections[] = "<tr><td>{$label}</td><td>{$r['total']}</td></tr>";
+            }
+            $htmlSections[] = "
+        </tbody>
+      </table>
+    </div>";
         }
 
         $reportDate = date('d/m/Y H:i');

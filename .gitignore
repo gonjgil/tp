@@ -7,3 +7,4 @@ package-lock.json
 .prettierrc.json
 node_modules/
 generar_hash.php
+controller/AdminController.bkp
